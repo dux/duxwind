@@ -6,40 +6,39 @@
     <title>DuxWind - Real-time CSS Generator</title>
     <script src="../src/dux-wind.js"></script>
     <script>
-        // Initialize DuxWind when DOM is loaded
+        // ✨ DuxWind auto-loads with 100+ utilities, 200+ keywords, and responsive breakpoints!
         document.addEventListener('DOMContentLoaded', function() {
-            // Load default config and reset CSS
-            DuxWind.resetCss();
-            DuxWind.loadDefaultConfig();
-
-            // Redefine breakpoints - mobile and desktop only
+            // 🎯 Optional: Override default breakpoints (already has mobile/desktop)
             DuxWind.config.breakpoints = {
                 'm': '(max-width: 768px)',    // Mobile: up to tablet
                 'd': '(min-width: 769px)'     // Desktop: tablet and up
             };
 
-            // Add example shortcuts
+            // 🛠️ Optional: Add custom shortcuts (build on auto-loaded utilities)
             DuxWind.config.shortcuts = {
                 'btn': 'px-4 py-2 rounded font-medium transition-all duration-200 cursor-pointer border',
                 'btn-primary': 'btn bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:border-blue-600 active:bg-blue-700',
-                'btn-outline': 'btn bg-transparent text-blue-500 border-blue-500 hover:bg-blue-50 active:bg-blue-100',
+                'btn-outline': 'btn bg-transparent text-blue-500 border-blue-500 hover:bg-blue-50 hover:border-blue-600 active:bg-blue-100 focus:ring-2',
                 'card': 'bg-white rounded-lg border p-6 shadow-sm',
                 'center': 'flex items-center justify-center',
                 'full-center': 'w-full h-full center',
                 'container': 'max-w-[1200px] mx-auto px-4',
                 'section': 'mb-12 p-6 bg-white rounded-lg border',
                 'h1': 'font-bold m:text-24px d:text-36px leading-tight',
-                'h2': 'font-semibold m:text-20px d:text-24px leading-tight',
-                // Test shortcut with conflicting properties
-                'spacious-box': 'p-8 bg-gray-100 border-2 m-4 rounded'
+                'h2': 'font-semibold m:text-20px d:text-24px leading-tight'
             };
 
-            // Initialize DuxWind after configuration is complete
-            DuxWind.init({ debug: true, clearCache: true });
+            // 🚀 One-line initialization: reset CSS + debug mode + all utilities ready!
+            DuxWind.init({ debug: true, reset: true });
+            
+            console.log('🎉 DuxWind ready! Auto-loaded:', 
+                Object.keys(DuxWind.config.properties).length, 'properties,',
+                Object.keys(DuxWind.config.keywords).length, 'keywords'
+            );
         });
     </script>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 min-h-screen flex flex-col">
     <style>
         * {
             transition: all 0.2s ease-in;
@@ -85,19 +84,46 @@
                 <button onclick="showSection('flex')" class="btn-outline">Flexbox</button>
                 <button onclick="showSection('grid')" class="btn-outline">Grid</button>
                 <button onclick="showSection('states')" class="btn-outline">States</button>
+                <button onclick="showSection('pseudo')" class="btn-outline">Pseudo Classes</button>
                 <button onclick="showSection('features')" class="btn-outline">Features</button>
-                <button onclick="showSection('override-test')" class="btn-outline">CSS Override</button>
                 <button onclick="showSection('documentation')" class="btn-outline">Docs</button>
+                <a href="../benchmark.html" target="_blank" class="btn-outline">⚡ Benchmark</a>
             </nav>
         </div>
     </header>
 
-    <main class="py-8">
+    <main class="py-8 flex-1">
         <div class="container">
 
         <!-- Introduction Section - Default Visible -->
         <section id="intro" class="section mb-8" style="display: block;">
             <h2 class="h2 mb-6">DuxWind Features Overview</h2>
+            
+            <!-- Auto-Loading Highlight -->
+            <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+                <h3 class="font-semibold text-green-800 mb-3">✨ Auto-Loaded & Ready to Use!</h3>
+                <div class="grid m:grid-cols-1 d:grid-cols-3 gap-4 text-sm">
+                    <div class="bg-white p-4 rounded border">
+                        <div class="font-medium text-green-700 mb-1">100+ CSS Properties</div>
+                        <div class="text-green-600">p-4, m-8, w-full, h-screen, text-lg, etc.</div>
+                    </div>
+                    <div class="bg-white p-4 rounded border">
+                        <div class="font-medium text-green-700 mb-1">200+ Keyword Classes</div>
+                        <div class="text-green-600">flex, grid, rounded, shadow-lg, animate-spin</div>
+                    </div>
+                    <div class="bg-white p-4 rounded border">
+                        <div class="font-medium text-green-700 mb-1">Complete Responsive</div>
+                        <div class="text-green-600">m:, d:, hover:, focus:, first:, last:</div>
+                    </div>
+                </div>
+                <div class="mt-4 p-3 bg-green-100 rounded border border-green-300">
+                    <code class="text-green-800 text-sm">
+                        // Just one line needed - everything auto-loads!<br>
+                        DuxWind.init({ reset: true });
+                    </code>
+                </div>
+            </div>
+            
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <p class="text-blue-800 mb-4">
                     Welcome to DuxWind! This demo showcases real-time Tailwind-like CSS generation with advanced features like shortcuts, pipe notation, and responsive design.
@@ -206,6 +232,93 @@
             </div>
         </section>
 
+        <!-- Pseudo Classes Section -->
+        <section id="pseudo" class="section" style="display: none;">
+            <h2 class="h2 mb-6">Pseudo Classes Demo</h2>
+            <div class="space-y-6">
+                <div class="card">
+                    <h3 class="font-semibold mb-4">Child Selectors</h3>
+                    <ul class="space-y-2">
+                        <li class="first:bg-green-100 first:font-semibold p-2 rounded">First item (green background, bold)</li>
+                        <li class="even:bg-blue-100 p-2 rounded">Second item (blue background - even)</li>
+                        <li class="odd:bg-yellow-100 p-2 rounded">Third item (yellow background - odd)</li>
+                        <li class="even:bg-blue-100 p-2 rounded">Fourth item (blue background - even)</li>
+                        <li class="last:bg-red-100 last:font-semibold p-2 rounded">Last item (red background, bold)</li>
+                    </ul>
+                    <code class="text-sm bg-gray-100 p-2 rounded block mt-2">first:bg-green-100 even:bg-blue-100 odd:bg-yellow-100 last:bg-red-100</code>
+                </div>
+
+                <div class="card">
+                    <h3 class="font-semibold mb-4">Form States</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <input type="text" class="w-full p-3 border rounded required:border-red-500 invalid:bg-red-50 valid:border-green-500" required placeholder="Required field - red border when empty">
+                            <p class="text-sm text-gray-600 mt-1">Required field with validation states</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2 checked:bg-green-500">
+                                <span>Checkbox (green when checked)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="radio-test" class="mr-2 checked:bg-blue-500">
+                                <span>Radio 1</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="radio-test" class="mr-2 checked:bg-blue-500">
+                                <span>Radio 2</span>
+                            </label>
+                        </div>
+                        <code class="text-sm bg-gray-100 p-2 rounded block">required:border-red-500 invalid:bg-red-50 checked:bg-green-500</code>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="font-semibold mb-4">Table with Row Styling</h3>
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="border-b-2">
+                                <th class="text-left p-3">Name</th>
+                                <th class="text-left p-3">Role</th>
+                                <th class="text-left p-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="odd:bg-gray-50 even:bg-white border-b">
+                                <td class="first:font-semibold p-3">John Doe</td>
+                                <td class="p-3">Developer</td>
+                                <td class="last:text-right p-3">Active</td>
+                            </tr>
+                            <tr class="odd:bg-gray-50 even:bg-white border-b">
+                                <td class="first:font-semibold p-3">Jane Smith</td>
+                                <td class="p-3">Designer</td>
+                                <td class="last:text-right p-3">Active</td>
+                            </tr>
+                            <tr class="odd:bg-gray-50 even:bg-white border-b">
+                                <td class="first:font-semibold p-3">Bob Johnson</td>
+                                <td class="p-3">Manager</td>
+                                <td class="last:text-right p-3">Away</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <code class="text-sm bg-gray-100 p-2 rounded block mt-2">odd:bg-gray-50 even:bg-white first:font-semibold last:text-right</code>
+                </div>
+
+                <div class="card">
+                    <h3 class="font-semibold mb-4">Empty State Demo</h3>
+                    <div class="space-y-4">
+                        <div class="empty:bg-yellow-100 empty:p-4 empty:text-center empty:border-2 empty:border-dashed empty:border-yellow-300 min-h-20 border rounded">
+                            <!-- This div is empty and should show yellow styling -->
+                        </div>
+                        <p class="text-sm text-gray-600">The box above is empty and styled with: <code>empty:bg-yellow-100 empty:p-4 empty:text-center</code></p>
+                        <div class="bg-green-100 p-4 text-center border-2 border-dashed border-green-300 rounded">
+                            This div has content, so no empty: styles apply
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Responsive Section -->
         <section id="responsive" class="section" style="display: none;">
             <h2 class="h2 mb-6">Responsive Demo</h2>
@@ -268,59 +381,6 @@
             </div>
         </section>
 
-        <!-- CSS Override Test Section -->
-        <section id="override-test" class="section" style="display: none;">
-            <h2 class="h2 mb-6">CSS Override Prevention Test</h2>
-            <div class="space-y-6">
-                <div class="card">
-                    <h3 class="font-semibold mb-4">Explicit Classes Override Shortcuts</h3>
-                    <p class="mb-4 text-gray-600">When you have explicit classes alongside shortcuts, explicit classes should take priority.</p>
-
-                    <div class="space-y-4">
-                        <!-- Test 1: Explicit padding overrides shortcut padding -->
-                        <div>
-                            <h4 class="font-medium mb-2">Test 1: Explicit p-2 + spacious-box shortcut</h4>
-                            <div class="p-2 spacious-box text-center">
-                                This should have 8px padding (from explicit p-2), not 32px (from spacious-box p-8)
-                            </div>
-                            <code class="text-sm bg-gray-100 p-2 rounded block mt-2">class="p-2 spacious-box"</code>
-                            <p class="text-sm text-gray-600 mt-1">spacious-box expands to: p-8 bg-gray-100 border-2 m-4 rounded</p>
-                            <p class="text-sm text-blue-600 mt-1">Expected: p-2 (8px) should override p-8 (32px) from the shortcut</p>
-                        </div>
-
-                        <!-- Test 2: Explicit margin overrides shortcut margin -->
-                        <div>
-                            <h4 class="font-medium mb-2">Test 2: Explicit m-2 + spacious-box shortcut</h4>
-                            <div class="m-2 spacious-box text-center">
-                                This should have 8px margin (from explicit m-2), not 16px (from spacious-box m-4)
-                            </div>
-                            <code class="text-sm bg-gray-100 p-2 rounded block mt-2">class="m-2 spacious-box"</code>
-                            <p class="text-sm text-gray-600 mt-1">spacious-box expands to: p-8 bg-gray-100 border-2 m-4 rounded</p>
-                            <p class="text-sm text-blue-600 mt-1">Expected: m-2 should override m-4 from the shortcut</p>
-                        </div>
-
-                        <!-- Test 3: Multiple explicit overrides -->
-                        <div>
-                            <h4 class="font-medium mb-2">Test 3: Multiple explicit overrides</h4>
-                            <div class="p-4 m-1 bg-red-200 spacious-box text-center">
-                                This should have: 16px padding (p-4), 4px margin (m-1), red background (bg-red-200)
-                            </div>
-                            <code class="text-sm bg-gray-100 p-2 rounded block mt-2">class="p-4 m-1 bg-red-200 spacious-box"</code>
-                            <p class="text-sm text-gray-600 mt-1">spacious-box expands to: p-8 bg-gray-100 border-2 m-4 rounded</p>
-                            <p class="text-sm text-blue-600 mt-1">Expected: All explicit classes should override shortcut values</p>
-                        </div>
-
-                        <!-- Debug console info -->
-                        <div class="bg-yellow-50 border border-yellow-200 rounded p-4">
-                            <h4 class="font-medium mb-2">Debug Information</h4>
-                            <p class="text-sm">Check the browser console for debug messages showing which classes were removed due to conflicts.</p>
-                            <p class="text-sm">Debug mode is enabled, so you should see messages like:</p>
-                            <code class="text-xs bg-yellow-100 p-1 rounded">DuxWind: Removed conflicting class 'p-8' (padding) in favor of explicit 'p-10'</code>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- Documentation Section -->
         <section id="documentation" class="section" style="display: none;">

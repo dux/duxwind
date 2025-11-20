@@ -5,25 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DuxWind - ES Module Example</title>
     <script type="module">
-        // Import DuxWind as ES module
+        // 📦 Import DuxWind as ES module - auto-loads complete configuration!
         import DuxWind from '../src/dux-wind.esm.js';
 
-        // You can also import individual functions
+        // 🔧 You can also import individual functions
         // import { init, resetCSS, loadDefaultConfig, config } from '../src/dux-wind.esm.js';
 
-        // Initialize DuxWind when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Load default config and reset CSS
-            DuxWind.resetCSS();
-            DuxWind.loadDefaultConfig();
-
-            // Redefine breakpoints - mobile and desktop only
+            console.log('📊 DuxWind ES Module Auto-loaded:');
+            console.log('  - Properties:', Object.keys(DuxWind.config.properties).length);
+            console.log('  - Keywords:', Object.keys(DuxWind.config.keywords).length);
+            console.log('  - Breakpoints:', Object.keys(DuxWind.config.breakpoints));
+            
+            // 🎯 Optional: Override default responsive breakpoints
             DuxWind.config.breakpoints = {
                 'm': '(max-width: 768px)',    // Mobile: up to tablet
                 'd': '(min-width: 769px)'     // Desktop: tablet and up
             };
 
-            // Add example shortcuts
+            // 🛠️ Optional: Add custom shortcuts (using auto-loaded utilities)
             DuxWind.config.shortcuts = {
                 'btn': 'px-4 py-2 rounded font-medium transition-all duration-200 cursor-pointer border',
                 'btn-primary': 'btn bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:border-blue-600 active:bg-blue-700',
@@ -32,15 +32,13 @@
                 'center': 'flex items-center justify-center',
                 'container': 'max-w-[1200px] mx-auto px-4',
                 'h1': 'font-bold m:text-24px d:text-36px leading-tight',
-                'h2': 'font-semibold m:text-20px d:text-24px leading-tight',
-                // Test shortcut with conflicting properties
-                'spacious-box': 'p-8 bg-gray-100 border-2 m-4 rounded'
+                'h2': 'font-semibold m:text-20px d:text-24px leading-tight'
             };
 
-            // Initialize DuxWind after configuration is complete
-            DuxWind.init({ debug: true, clearCache: true });
+            // ✨ Single line initialization with auto-loaded defaults
+            DuxWind.init({ debug: true, reset: true });
 
-            console.log('✅ DuxWind loaded as ES module!');
+            console.log('🎉 DuxWind ES Module ready! All utilities auto-loaded.');
         });
     </script>
 </head>
@@ -89,6 +87,15 @@
 
         <!-- Demo Tests -->
         <div class="space-y-6">
+            <!-- Performance Benchmark Link -->
+            <div class="card bg-yellow-50 border-yellow-200">
+                <h2 class="h2 mb-4">⚡ Performance Testing</h2>
+                <div class="flex items-center justify-between">
+                    <p class="text-gray-700">Test DuxWind's real-time generation speed vs traditional CSS frameworks</p>
+                    <a href="../benchmark.html" target="_blank" class="btn-primary">Run Benchmark</a>
+                </div>
+            </div>
+            
             <!-- Module Loading Test -->
             <div class="card">
                 <h2 class="h2 mb-4">ES Module Loading Test</h2>

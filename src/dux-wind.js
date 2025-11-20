@@ -9,7 +9,7 @@ const DuxWind = (function() {
   // CONFIGURATION & STATE
   // ===================================================================
   
-  let config = createDefaultConfig();
+  let config = loadFullDefaultConfig();
   const processedClasses = new Set();
   let styleElement = null;
   let debugMode = false;
@@ -26,6 +26,19 @@ const DuxWind = (function() {
       pixelMultiplier: 4,
       properties: {},
       keywords: {},
+      shortcuts: {}
+    };
+  }
+
+  function loadFullDefaultConfig() {
+    return {
+      breakpoints: {
+        'm': '(max-width: 767px)',
+        'd': '(min-width: 768px)'
+      },
+      pixelMultiplier: 4,
+      properties: createDefaultProperties(),
+      keywords: createDefaultKeywords(),
       shortcuts: {}
     };
   }
@@ -53,24 +66,13 @@ const DuxWind = (function() {
 
   function expandClass(className) {
     const cleanClass = cleanClassName(className);
-    const currentConfig = getConfig();
 
-    // 1. Expand shortcuts first
-    if (currentConfig.shortcuts?.[className]) {
-      const shortcutClasses = currentConfig.shortcuts[className].split(/\s+/).filter(Boolean);
-      const allExpanded = [];
-      shortcutClasses.forEach(cls => {
-        allExpanded.push(...expandClass(cls));
-      });
-      return allExpanded;
-    }
-
-    // 2. Expand pipe notation
+    // 1. Expand pipe notation
     if (cleanClass.includes('|')) {
       return expandPipeNotation(cleanClass);
     }
 
-    // 3. Return cleaned class
+    // 2. Return cleaned class (shortcuts are no longer expanded)
     return [cleanClass];
   }
 
@@ -136,15 +138,19 @@ const DuxWind = (function() {
     const parsed = parseClassModifiers(className);
     const { actualClass, breakpoint, modifiers } = parsed;
 
-    // 1. Check for keyword classes (flex, hidden, etc.)
+    // 1. Check for shortcut classes first
+    const shortcutCSS = tryParseShortcut(actualClass, className, modifiers, breakpoint);
+    if (shortcutCSS) return shortcutCSS;
+
+    // 2. Check for keyword classes (flex, hidden, etc.)
     const keywordCSS = tryParseKeyword(actualClass, className, modifiers, breakpoint);
     if (keywordCSS) return keywordCSS;
 
-    // 2. Try numeric classes (p-4, m-10px, opacity-50)
+    // 3. Try numeric classes (p-4, m-10px, opacity-50)
     const numericCSS = tryParseNumeric(actualClass, className, modifiers, breakpoint);
     if (numericCSS) return numericCSS;
 
-    // 3. Try arbitrary values (w-200px, bg-#123)
+    // 4. Try arbitrary values (w-200px, bg-#123)
     const arbitraryCSS = tryParseArbitrary(actualClass, className, modifiers, breakpoint);
     if (arbitraryCSS) return arbitraryCSS;
 
@@ -153,7 +159,17 @@ const DuxWind = (function() {
 
   function parseClassModifiers(className) {
     const parts = className.split(':');
-    const pseudoStates = ['hover', 'focus', 'active', 'disabled', 'visited', 'focus-within', 'focus-visible'];
+    const pseudoStates = [
+      'hover', 'focus', 'active', 'disabled', 'visited', 'focus-within', 'focus-visible',
+      // Child selectors
+      'first', 'last', 'only', 'odd', 'even', 'first-of-type', 'last-of-type', 'only-of-type',
+      // Form states
+      'required', 'invalid', 'valid', 'checked', 'indeterminate', 'default', 'enabled', 'read-only',
+      // Interactive states
+      'target', 'open', 'empty', 'root', 'any-link', 'link',
+      // Direction
+      'dir-ltr', 'dir-rtl'
+    ];
     
     let breakpoint = null;
     let modifiers = [];
@@ -174,6 +190,114 @@ const DuxWind = (function() {
 
     const actualClass = parts.slice(classIndex).join(':');
     return { actualClass, breakpoint, modifiers };
+  }
+
+  function generateCSSPropertiesForClass(className) {
+    const cleanClass = cleanClassName(className);
+    const parsed = parseClassModifiers(cleanClass);
+    const { actualClass } = parsed;
+
+    // 1. Check for nested shortcuts first
+    const shortcuts = getConfig().shortcuts;
+    if (shortcuts && shortcuts[actualClass]) {
+      const shortcutClasses = shortcuts[actualClass].split(/\s+/).filter(Boolean);
+      const cssDeclarations = [];
+      
+      shortcutClasses.forEach(cls => {
+        const cssProps = generateCSSPropertiesForClass(cls);
+        if (cssProps) {
+          cssDeclarations.push(cssProps);
+        }
+      });
+      
+      return cssDeclarations.length > 0 ? cssDeclarations.join('; ') : null;
+    }
+
+    // 2. Check for keyword classes
+    const keywords = getConfig().keywords;
+    if (keywords && keywords[actualClass]) {
+      return keywords[actualClass];
+    }
+
+    // 3. Try numeric classes (p-4, m-10px, opacity-50)
+    const numericMatch = actualClass.match(/^(-?)([a-z-]+)-(\d+)(px|%)?$/);
+    if (numericMatch) {
+      const [, negative, property, value, unit] = numericMatch;
+      const cssValue = calculateNumericValue(property, value, unit, negative);
+      const cssProperty = getConfig().properties[property];
+      
+      if (cssProperty) {
+        if (Array.isArray(cssProperty)) {
+          return cssProperty.map(prop => `${prop}: ${cssValue}`).join('; ');
+        }
+        return `${cssProperty}: ${cssValue}`;
+      }
+    }
+
+    // 4. Try arbitrary values (w-[200px], bg-[#123], max-w-[1200px])
+    const arbitraryMatch = actualClass.match(/^([a-z-]+)-(.+)$/);
+    if (arbitraryMatch) {
+      const [, property, value] = arbitraryMatch;
+      const cssProperty = getConfig().properties[property];
+      
+      if (cssProperty) {
+        if (Array.isArray(cssProperty)) {
+          return cssProperty.map(prop => `${prop}: ${value}`).join('; ');
+        }
+        return `${cssProperty}: ${value}`;
+      }
+    }
+
+    return null;
+  }
+
+  function tryParseShortcut(actualClass, className, modifiers, breakpoint) {
+    const shortcuts = getConfig().shortcuts;
+    if (shortcuts && shortcuts[actualClass]) {
+      const shortcutClasses = shortcuts[actualClass].split(/\s+/).filter(Boolean);
+      
+      // Separate classes by whether they have their own modifiers or not
+      const baseClasses = [];
+      const modifierClasses = [];
+      
+      shortcutClasses.forEach(cls => {
+        if (cls.includes(':')) {
+          // This class has its own modifiers (like hover:bg-blue-600)
+          modifierClasses.push(cls);
+        } else {
+          // This class has no modifiers, gets base styles
+          const cssProps = generateCSSPropertiesForClass(cls);
+          if (cssProps) {
+            baseClasses.push(cssProps);
+          }
+        }
+      });
+      
+      // Generate base CSS rule with all non-modifier classes
+      let cssRules = [];
+      if (baseClasses.length > 0) {
+        const baseCombinedCSS = baseClasses.join('; ');
+        cssRules.push(generateCSSRule(className, 'KEYWORD', baseCombinedCSS, modifiers, breakpoint));
+      }
+      
+      // Generate separate CSS rules for classes with their own modifiers
+      modifierClasses.forEach(cls => {
+        const classParsed = parseClassModifiers(cls);
+        const { actualClass, modifiers: classModifiers } = classParsed;
+        
+        // Generate CSS for the actual class without modifiers
+        const cssProps = generateCSSPropertiesForClass(actualClass);
+        if (cssProps) {
+          // Combine the shortcut's modifiers with the class's own modifiers
+          const allModifiers = [...(modifiers || []), ...(classModifiers || [])];
+          const cssRule = generateCSSRule(className, 'KEYWORD', cssProps, allModifiers, breakpoint);
+          cssRules.push(cssRule);
+        }
+      });
+      
+      return cssRules.length > 0 ? cssRules.join('\n') : null;
+    }
+    return null;
   }
 
   function tryParseKeyword(actualClass, className, modifiers, breakpoint) {
@@ -237,9 +361,45 @@ const DuxWind = (function() {
     let selector = `.${className.replace(/:/g, '\\:').replace(/\./g, '\\.')}`;
     
     modifiers.forEach(modifier => {
-      const pseudoClass = (modifier === 'focus-within' || modifier === 'focus-visible') 
-        ? `:${modifier}` 
-        : `:${modifier}`;
+      let pseudoClass;
+      
+      // Map pseudo-selectors to their CSS equivalents
+      switch (modifier) {
+        case 'first':
+          pseudoClass = ':first-child';
+          break;
+        case 'last':
+          pseudoClass = ':last-child';
+          break;
+        case 'only':
+          pseudoClass = ':only-child';
+          break;
+        case 'odd':
+          pseudoClass = ':nth-child(odd)';
+          break;
+        case 'even':
+          pseudoClass = ':nth-child(even)';
+          break;
+        case 'first-of-type':
+          pseudoClass = ':first-of-type';
+          break;
+        case 'last-of-type':
+          pseudoClass = ':last-of-type';
+          break;
+        case 'only-of-type':
+          pseudoClass = ':only-of-type';
+          break;
+        case 'dir-ltr':
+          pseudoClass = ':dir(ltr)';
+          break;
+        case 'dir-rtl':
+          pseudoClass = ':dir(rtl)';
+          break;
+        default:
+          // For standard pseudo-classes like hover, focus, etc.
+          pseudoClass = `:${modifier}`;
+      }
+      
       selector += pseudoClass;
     });
     
@@ -269,8 +429,9 @@ const DuxWind = (function() {
     const originalClasses = Array.from(element.classList);
     const expandedClasses = expandElementClasses(originalClasses);
     
-    // Update element classes if expansions occurred
-    if (hasClassExpansions(originalClasses, expandedClasses)) {
+    // Update element classes if expansions occurred (pipe notation, @ notation)
+    if (expandedClasses.length !== originalClasses.length || 
+        !originalClasses.every((cls, i) => cls === expandedClasses[i])) {
       element.className = expandedClasses.join(' ');
       
       if (debugMode) {
@@ -284,144 +445,23 @@ const DuxWind = (function() {
 
   function expandElementClasses(classes) {
     const expanded = [];
-    const explicitClasses = new Set(); // Track explicitly set classes
     
-    // First pass: collect explicit (non-shortcut, non-pipe, non-@) classes
-    classes.forEach(className => {
-      const currentConfig = getConfig();
-      const cleanClass = cleanClassName(className);
-      
-      // Skip shortcuts, pipe notation, and @ notation classes - these need expansion
-      const isShortcut = currentConfig.shortcuts?.[className];
-      const hasPipe = className.includes('|') || cleanClass.includes('|');
-      const hasAtNotation = className.includes('@');
-      
-      if (!isShortcut && !hasPipe && !hasAtNotation) {
-        explicitClasses.add(className);
-        if (debugMode) {
-          console.log(`DuxWind: Added explicit class: ${className}`);
-        }
-      } else if (debugMode) {
-        console.log(`DuxWind: Skipping expansion class: ${className} (shortcut: ${isShortcut}, pipe: ${hasPipe}, @: ${hasAtNotation})`);
-      }
-    });
-    
-    // Second pass: expand all classes
+    // Expand all classes (pipe notation and @ notation)
     classes.forEach(className => {
       expanded.push(...expandClass(className));
     });
     
-    // Third pass: remove conflicting classes from expansions
-    return removeConflictingClasses(expanded, explicitClasses);
+    return expanded;
   }
 
-  function removeConflictingClasses(expandedClasses, explicitClasses) {
-    const explicitProperties = new Map(); // property -> class name
-    const processedClasses = new Set(); // track classes we've already processed
-    
-    // Map explicit classes to their CSS properties
-    explicitClasses.forEach(className => {
-      const properties = getClassCSSProperties(className);
-      properties.forEach(prop => {
-        explicitProperties.set(prop, className);
-      });
-    });
-    
-    // Filter out conflicting classes, keeping only the first occurrence of each property
-    return expandedClasses.filter(className => {
-      // Always keep explicit classes
-      if (explicitClasses.has(className)) {
-        return true;
-      }
-      
-      // Check if this expanded class conflicts with any explicit class
-      const properties = getClassCSSProperties(className);
-      for (const prop of properties) {
-        if (explicitProperties.has(prop)) {
-          if (debugMode) {
-            console.log(`DuxWind: Removed conflicting class '${className}' (${prop}) in favor of explicit '${explicitProperties.get(prop)}'`);
-          }
-          return false; // Remove this class due to conflict with explicit class
-        }
-      }
-      
-      return true; // Keep this class
-    });
-  }
 
-  function getClassCSSProperties(className) {
-    const properties = new Set();
-    
-    // Parse class modifiers to get the actual class
-    const parsed = parseClassModifiers(className);
-    const { actualClass } = parsed;
-    
-    // Check if it's a keyword class
-    const keywords = getConfig().keywords;
-    if (keywords && keywords[actualClass]) {
-      // Extract properties from keyword CSS
-      const css = keywords[actualClass];
-      const propMatches = css.match(/([a-z-]+):/g);
-      if (propMatches) {
-        propMatches.forEach(match => {
-          properties.add(match.slice(0, -1)); // Remove the ':'
-        });
-      }
-      return Array.from(properties);
-    }
-    
-    // Handle common background color pattern (bg-*)
-    if (actualClass.startsWith('bg-')) {
-      return ['background-color'];
-    }
-    
-    // Try numeric pattern (p-10, m-4px, etc.)
-    const numericMatch = actualClass.match(/^(-?)([a-z-]+)-(\d+)(px|%)?$/);
-    if (numericMatch) {
-      const [, , property] = numericMatch;
-      const cssProperty = getConfig().properties[property];
-      if (cssProperty) {
-        if (Array.isArray(cssProperty)) {
-          return cssProperty;
-        }
-        return [cssProperty];
-      }
-    }
-    
-    // Try arbitrary values (w-200px, bg-#123)
-    const arbitraryMatch = actualClass.match(/^([a-z-]+)-(.+)$/);
-    if (arbitraryMatch) {
-      const [, property] = arbitraryMatch;
-      const cssProperty = getConfig().properties[property];
-      if (cssProperty) {
-        if (Array.isArray(cssProperty)) {
-          return cssProperty;
-        }
-        return [cssProperty];
-      }
-    }
-    
-    return [];
-  }
 
-  function hasClassExpansions(original, expanded) {
-    return expanded.length !== original.length || 
-           !original.every((cls, i) => cls === expanded[i]);
-  }
 
   function processClassForCSS(className) {
     if (processedClasses.has(className)) return;
     processedClasses.add(className);
 
-    // Handle shortcuts by recursive processing
-    const currentConfig = getConfig();
-    if (currentConfig.shortcuts?.[className]) {
-      const shortcutClasses = currentConfig.shortcuts[className].split(/\s+/).filter(Boolean);
-      shortcutClasses.forEach(cls => processClassForCSS(cls));
-      return;
-    }
-
-    // Generate CSS for individual class
+    // Generate CSS for class (shortcuts are now handled directly in parseAndGenerateCSS)
     generateCSSForClass(className);
   }
 
@@ -481,8 +521,12 @@ const DuxWind = (function() {
     debugMode = settings.debug;
     window.DuxWindDebug = debugMode;
 
-    if (settings.clearCache) {
-      processedClasses.clear();
+    // Always clear cache by default
+    processedClasses.clear();
+
+    // Apply CSS reset if requested
+    if (settings.reset) {
+      resetCSS();
     }
 
     // Process existing elements
@@ -494,14 +538,9 @@ const DuxWind = (function() {
   }
 
   function parseInitOptions(options) {
-    // Handle legacy boolean parameter
-    if (typeof options === 'boolean') {
-      options = { clearCache: options };
-    }
-
     return {
-      clearCache: true,
       debug: options.debug !== undefined ? options.debug : (window.location.port > 2000),
+      reset: options.reset !== undefined ? options.reset : false,
       ...options
     };
   }
@@ -565,16 +604,7 @@ details summary{cursor:pointer}
   }
 
   function loadDefaultConfig() {
-    config = {
-      breakpoints: {
-        'm': '(max-width: 767px)',
-        'd': '(min-width: 768px)'
-      },
-      pixelMultiplier: 4,
-      properties: createDefaultProperties(),
-      keywords: createDefaultKeywords(),
-      shortcuts: {}
-    };
+    config = loadFullDefaultConfig();
   }
 
   // ===================================================================
@@ -626,6 +656,7 @@ details summary{cursor:pointer}
       'gap-y': 'row-gap',
       'space-x': 'margin-left',
       'space-y': 'margin-top',
+      'flex': 'flex',
       
       // Layout
       'top': 'top',
@@ -770,6 +801,12 @@ details summary{cursor:pointer}
       'flex-row-reverse': 'flex-direction: row-reverse',
       'flex-col': 'flex-direction: column',
       'flex-col-reverse': 'flex-direction: column-reverse',
+      
+      // Flex grow/shrink
+      'flex-1': 'flex: 1 1 0%',
+      'flex-auto': 'flex: 1 1 auto',
+      'flex-initial': 'flex: 0 1 auto',
+      'flex-none': 'flex: none',
       
       // Flex wrap
       'flex-wrap': 'flex-wrap: wrap',

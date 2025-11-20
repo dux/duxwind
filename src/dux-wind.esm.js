@@ -6,7 +6,7 @@
 // CONFIGURATION & STATE
 // ===================================================================
 
-let config = createDefaultConfig();
+let config = loadFullDefaultConfig();
 const processedClasses = new Set();
 let styleElement = null;
 let debugMode = false;
@@ -23,6 +23,19 @@ function createDefaultConfig() {
     pixelMultiplier: 4,
     properties: {},
     keywords: {},
+    shortcuts: {}
+  };
+}
+
+function loadFullDefaultConfig() {
+  return {
+    breakpoints: {
+      'm': '(max-width: 767px)',
+      'd': '(min-width: 768px)'
+    },
+    pixelMultiplier: 4,
+    properties: createDefaultProperties(),
+    keywords: createDefaultKeywords(),
     shortcuts: {}
   };
 }
@@ -566,16 +579,7 @@ details summary{cursor:pointer}
 }
 
 function loadDefaultConfig() {
-  config = {
-    breakpoints: {
-      'm': '(max-width: 767px)',
-      'd': '(min-width: 768px)'
-    },
-    pixelMultiplier: 4,
-    properties: createDefaultProperties(),
-    keywords: createDefaultKeywords(),
-    shortcuts: {}
-  };
+  config = loadFullDefaultConfig();
 }
 
 // ===================================================================
