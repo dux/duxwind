@@ -22,46 +22,36 @@ export function setConfig(newConfig) {
   Object.assign(CONFIG, newConfig);
 }
 
-// Element processing - let styler handle all expansion and CSS generation
+// Process entire class attribute string
+function expandClassString(classString) {
+  return classString
+    .split(/\s+/)
+    .filter(Boolean)
+    .flatMap(expandClass)  // This handles colon-to-pipe conversion and all expansions
+    .join(' ');
+}
+
+// Element processing - process entire class attribute
 const processElement = safeWrapper(function(element) {
-  if (!element.classList?.length) return;
+  const originalClassString = element.getAttribute('class');
+  if (!originalClassString || !originalClassString.trim()) return;
 
-  const originalClasses = Array.from(element.classList);
+  const processedClassString = expandClassString(originalClassString);
   
-  // Check if this element has classes that need DOM expansion (pipe notation or @ notation)
-  const needsDOMExpansion = originalClasses.some(cls => cls.includes('|') || cls.includes('@'));
-  
-  if (needsDOMExpansion) {
-    // Let styler expand classes, then update DOM
-    const expandedClasses = [];
-    originalClasses.forEach(className => {
-      if (className.includes('|') || className.includes('@')) {
-        // Use styler's expandClass to get expanded classes
-        const expanded = expandClass(className);
-        expandedClasses.push(...expanded);
-      } else {
-        expandedClasses.push(className);
-      }
-    });
-
-    // Update the DOM with expanded classes
-    element.className = expandedClasses.join(' ');
+  // Replace class attribute if it changed
+  if (processedClassString !== originalClassString) {
+    element.setAttribute('class', processedClassString);
     
-    // Set debug attribute to track original classes
+    // Add debug info if enabled
     if (debugMode) {
-      element.setAttribute('data-dw-original-classes', originalClasses.join(' '));
+      element.setAttribute('data-dw-original', originalClassString);
     }
-
-    // Process CSS for all expanded classes
-    expandedClasses.forEach(className => {
-      processClassForCSS(className);
-    });
-  } else {
-    // No expansion needed, just process CSS for existing classes
-    originalClasses.forEach(className => {
-      processClassForCSS(className);
-    });
   }
+  
+  // Generate CSS for all processed classes
+  processedClassString.split(/\s+/).filter(Boolean).forEach(className => {
+    processClassForCSS(className);
+  });
 }, 'processElement');
 
 

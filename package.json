@@ -24,7 +24,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "bun build src/dux-wind.js --outdir dist --format esm && bun build src/dux-wind.js --outdir dist --format cjs --outfile dist/dux-wind.cjs",
+    "build": "rm -rf dist/ && bun build src/dux-wind.js --outfile dist/dux-wind.js --format esm && bun build src/dux-wind.js --outfile dist/dux-wind.cjs --format cjs",
     "test": "bun test src/",
     "start": "bun run bin/server.js",
     "dev": "bun run --watch bin/server.js & bun build src/dux-wind.js --outdir dist --format esm --watch & bun build src/dux-wind.js --outdir dist --format cjs --outfile dist/dux-wind.cjs --watch",
