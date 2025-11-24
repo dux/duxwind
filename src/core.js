@@ -1,7 +1,7 @@
 // DuxWind - Real-time CSS Generator Core
 import { CONFIG, createDefaultConfig } from './config.js';
 import { processClass, expandClass } from './styler.js';
-import { addShortcut, isShortcut } from './shortcuts.js';
+import { addShortcut, isShortcut, CLASS_NAME_PATTERN } from './shortcuts.js';
 import { debounce, safeWrapper, clearMemoCache } from './utils.js';
 import { splitContainerQueryClasses, updateContainerQueries, cleanupContainerQueriesForTree } from './container-query.js';
 import { generateDoc } from './gen-doc.js';
@@ -442,23 +442,42 @@ export function loadClass(className) {
   processClassForCSS(className);
 }
 
+function getProcessableShortcutName(shortcutName) {
+  if (typeof shortcutName !== 'string') {
+    return shortcutName;
+  }
+
+  const trimmedName = shortcutName.trim();
+
+  if (trimmedName.startsWith('.') && CLASS_NAME_PATTERN.test(trimmedName.slice(1))) {
+    return trimmedName.slice(1);
+  }
+
+  return trimmedName;
+}
+
 function registerShortcut(shortcutName, shortcutClasses) {
-  const existingDefinition = CONFIG.shortcuts?.[shortcutName];
+  const normalizedName = typeof shortcutName === 'string' ? shortcutName.trim() : shortcutName;
+  const existingDefinition = CONFIG.shortcuts?.[normalizedName];
   if (existingDefinition === shortcutClasses) {
     return true; // Nothing changed, skip reprocessing
   }
 
-  const success = addShortcut(shortcutName, shortcutClasses);
+  const success = addShortcut(normalizedName, shortcutClasses);
   if (!success) {
     return false;
   }
 
   // Allow regenerated CSS for this class
-  processedClasses.delete(shortcutName);
+  const processableName = getProcessableShortcutName(normalizedName);
+  if (processableName) {
+    processedClasses.delete(processableName);
+  }
 
   // Immediately inject CSS for shortcuts that may already exist in the DOM
   if (typeof document !== 'undefined') {
-    processClassForCSS(shortcutName);
+    const targetName = processableName || normalizedName;
+    processClassForCSS(targetName);
   }
 
   return true;

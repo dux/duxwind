@@ -349,41 +349,47 @@ function tryParseArbitrary(actualClass, className, modifiers, breakpoint) {
     ? rawValue.slice(1, -1)  // Remove brackets
     : rawValue;
 
+  let resolvedProperty = cssProperty;
+  const trimmedValue = value.trim();
+  if (property === 'text' && isLikelyColorValue(trimmedValue)) {
+    resolvedProperty = 'color';
+  }
+
   // Special handling for transform functions
-  let cssValue = value;
-  if (cssProperty === 'transform') {
+  let cssValue = trimmedValue;
+  if (resolvedProperty === 'transform') {
     // Transform functions need to be wrapped properly
     switch (property) {
       case 'scale':
-        cssValue = `scale(${value})`;
+        cssValue = `scale(${trimmedValue})`;
         break;
       case 'scale-x':
-        cssValue = `scaleX(${value})`;
+        cssValue = `scaleX(${trimmedValue})`;
         break;
       case 'scale-y':
-        cssValue = `scaleY(${value})`;
+        cssValue = `scaleY(${trimmedValue})`;
         break;
       case 'rotate':
-        cssValue = `rotate(${value})`;
+        cssValue = `rotate(${trimmedValue})`;
         break;
       case 'translate-x':
-        cssValue = `translateX(${value})`;
+        cssValue = `translateX(${trimmedValue})`;
         break;
       case 'translate-y':
-        cssValue = `translateY(${value})`;
+        cssValue = `translateY(${trimmedValue})`;
         break;
       case 'skew-x':
-        cssValue = `skewX(${value})`;
+        cssValue = `skewX(${trimmedValue})`;
         break;
       case 'skew-y':
-        cssValue = `skewY(${value})`;
+        cssValue = `skewY(${trimmedValue})`;
         break;
       default:
-        cssValue = value;
+        cssValue = trimmedValue;
     }
   }
 
-  return buildCSSRule(className, cssProperty, cssValue, modifiers, breakpoint);
+  return buildCSSRule(className, resolvedProperty, cssValue, modifiers, breakpoint);
 }
 
 /**
@@ -471,5 +477,32 @@ function buildCSSDeclaration(selector, cssProperty, cssValue) {
   }
 
   return `${selector} { ${cssProperty}: ${cssValue}; }`;
+}
+
+function isLikelyColorValue(value) {
+  if (!value) {
+    return false;
+  }
+
+  const trimmed = value.trim();
+  const lower = trimmed.toLowerCase();
+
+  if (trimmed.startsWith('#')) return true;
+  if (lower.startsWith('rgb(') || lower.startsWith('rgba(')) return true;
+  if (lower.startsWith('hsl(') || lower.startsWith('hsla(')) return true;
+  if (lower.startsWith('lab(') || lower.startsWith('lch(') || lower.startsWith('oklab(') || lower.startsWith('oklch(')) return true;
+  if (lower.startsWith('color(')) return true;
+  if (lower.startsWith('var(')) return true;
+  if (lower.startsWith('--')) return true;
+
+  const COLOR_KEYWORDS = new Set([
+    'transparent',
+    'currentcolor',
+    'inherit',
+    'initial',
+    'unset'
+  ]);
+
+  return COLOR_KEYWORDS.has(lower);
 }
 

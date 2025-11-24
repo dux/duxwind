@@ -169,7 +169,6 @@ function createDefaultProperties() {
 
     // Colors
     'bg': 'background-color',
-    'text': 'color',
     'border-color': 'border-color',
     'outline': 'outline-color',
     'decoration': 'text-decoration-color',

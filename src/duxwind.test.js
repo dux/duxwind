@@ -640,6 +640,50 @@ describe('DuxWind Test Suite - Input/Output Examples', () => {
       expect(css).toContain('padding-left: 16px;');
       expect(css).toContain('padding-left: 32px;');
     });
+
+    test('selector shortcuts register raw selectors without dot prefix', () => {
+      const initialCSSLength = capturedCSS.length;
+
+      const success = DuxWind.shortcut('body h3', 'px-4 py-2 font-semibold');
+      expect(success).toBe(true);
+
+      const css = capturedCSS.substring(initialCSSLength);
+      expect(css).toContain('body h3 {');
+      expect(css).toContain('padding-left: 16px;');
+      expect(css).toContain('font-weight: 600;');
+    });
+
+    test('selector shortcuts support comma-separated selectors', () => {
+      const initialCSSLength = capturedCSS.length;
+      const definition = 'text-60px leading-80px font-bold mb-30px m:text-center m:text-30px m:leading-45px m:mb-10px';
+
+      const success = DuxWind.shortcut('.h1, .prose h1', definition);
+      expect(success).toBe(true);
+
+      const css = capturedCSS.substring(initialCSSLength);
+      expect(css).toContain('.h1, .prose h1 {');
+      expect(css).toContain('font-size: 60px;');
+      expect(css).toContain('line-height: 80px;');
+      expect(css).toContain('font-weight: 700;');
+      expect(css).toContain('margin-bottom: 30px;');
+      expect(css).toContain('@media (max-width: 768px)');
+      expect(css).toContain('text-align: center;');
+      expect(css).toContain('font-size: 30px;');
+    });
+
+    test('dot-prefixed shortcuts behave like class shortcuts', () => {
+      const initialCSSLength = capturedCSS.length;
+
+      const success = DuxWind.shortcut('.big-box', 'br-0|4');
+      expect(success).toBe(true);
+
+      const css = capturedCSS.substring(initialCSSLength);
+      expect(css).toContain('.big-box {');
+      expect(css).toContain('border-radius');
+
+      const loadResult = testClassWithOutput('big-box');
+      expect(loadResult.success).toBe(true);
+    });
   });
 
   describe('Advanced Features: Special Notation', () => {

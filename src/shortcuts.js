@@ -3,13 +3,36 @@ import { CONFIG } from './config.js';
 import { generateStyles } from './styler.js';
 import { safeWrapper, escapeSelector } from './utils.js';
 
+export const CLASS_NAME_PATTERN = /^[\w-]+$/;
+
+function resolveShortcutEntry(name) {
+  if (!CONFIG.shortcuts || !name) {
+    return null;
+  }
+
+  const trimmed = typeof name === 'string' ? name.trim() : name;
+  if (!trimmed) {
+    return null;
+  }
+
+  if (CONFIG.shortcuts[trimmed]) {
+    return CONFIG.shortcuts[trimmed];
+  }
+
+  if (typeof trimmed === 'string' && CLASS_NAME_PATTERN.test(trimmed)) {
+    return CONFIG.shortcuts[`.${trimmed}`] || null;
+  }
+
+  return null;
+}
+
 /**
  * Check if a class name is a shortcut
  * @param {string} className
  * @returns {boolean}
  */
 export function isShortcut(className) {
-  return CONFIG.shortcuts && CONFIG.shortcuts[className];
+  return Boolean(resolveShortcutEntry(className));
 }
 
 /**
@@ -18,7 +41,7 @@ export function isShortcut(className) {
  * @returns {string|null} Space-separated class list or null
  */
 export function getShortcut(shortcutName) {
-  return CONFIG.shortcuts?.[shortcutName] || null;
+  return resolveShortcutEntry(shortcutName);
 }
 
 /**
@@ -93,8 +116,17 @@ export const generateShortcutCSS = safeWrapper(function(shortcutName, processCla
     .map(parseShortcutRule)
     .filter(Boolean);
 
-  const shortcutSelector = escapeSelector(shortcutName);
-  const nestedCSS = buildNestedShortcutCSS(shortcutSelector, parsedRules);
+  const trimmedShortcutName = shortcutName.trim();
+  if (!trimmedShortcutName) {
+    return [];
+  }
+
+  const isClassShortcut = CLASS_NAME_PATTERN.test(trimmedShortcutName);
+  const baseSelector = isClassShortcut
+    ? `.${escapeSelector(trimmedShortcutName)}`
+    : trimmedShortcutName;
+
+  const nestedCSS = buildNestedShortcutCSS(baseSelector, parsedRules);
 
   return nestedCSS ? [nestedCSS] : [];
 }, 'generateShortcutCSS');
@@ -147,7 +179,7 @@ export function generateShortcutCSSFromClasses(classNames) {
     .map(parseShortcutRule)
     .filter(Boolean);
 
-  const nestedCSS = buildNestedShortcutCSS(escapeSelector('shortcut'), parsedRules);
+  const nestedCSS = buildNestedShortcutCSS(`.${escapeSelector('shortcut')}`, parsedRules);
   return nestedCSS || '/* No CSS generated for the provided class names */';
 }
 
@@ -247,7 +279,7 @@ function splitDeclarations(block) {
     .map(part => (part.endsWith(';') ? part : `${part};`));
 }
 
-function buildNestedShortcutCSS(shortcutSelector, parsedRules) {
+function buildNestedShortcutCSS(baseSelector, parsedRules) {
   if (!parsedRules.length) {
     return null;
   }
@@ -262,7 +294,7 @@ function buildNestedShortcutCSS(shortcutSelector, parsedRules) {
     return null;
   }
 
-  return `.${shortcutSelector} {\n${body}}`;
+  return `${baseSelector} {\n${body}}`;
 }
 
 function createBucket() {
