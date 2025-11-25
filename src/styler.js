@@ -33,13 +33,42 @@ generateStyles.defaultValue = [];
  * @param {string} className - Raw class name like "p-[10px]", "p-10@m", "p-10|20"
  * @returns {string[]} Array of expanded/cleaned class names ready for processing
  */
+const IMPORTANCE_LEVELS = Object.freeze({
+  NONE: 'none',
+  IMPORTANT: 'important',
+  SCOPED: 'scoped'
+});
+
+function parseImportanceSuffix(className) {
+  if (!className) {
+    return { baseClassName: className, suffix: '', level: IMPORTANCE_LEVELS.NONE };
+  }
+
+  if (className.endsWith('!!')) {
+    return { baseClassName: className.slice(0, -2), suffix: '!!', level: IMPORTANCE_LEVELS.SCOPED };
+  }
+
+  if (className.endsWith('!')) {
+    return { baseClassName: className.slice(0, -1), suffix: '!', level: IMPORTANCE_LEVELS.IMPORTANT };
+  }
+
+  return { baseClassName: className, suffix: '', level: IMPORTANCE_LEVELS.NONE };
+}
+
+function restoreImportanceSuffix(className, suffix) {
+  return suffix ? `${className}${suffix}` : className;
+}
+
 export function expandClass(className) {
   if (!className || typeof className !== 'string') {
     return [];
   }
 
+  const trimmedClass = className.trim();
+  const { baseClassName, suffix } = parseImportanceSuffix(trimmedClass);
+
   // Step 1: Clean bracket syntax: w-[200px] → w-200px, bg-[#ff0000] → bg-ff0000
-  let cleanClass = cleanClassName(className);
+  let cleanClass = cleanClassName(baseClassName);
 
   // Step 2: Handle @ notation: p-10@m → m:p-10
   cleanClass = handleAtNotation(cleanClass);
@@ -49,11 +78,11 @@ export function expandClass(className) {
 
   // Step 4: Expand pipe notation: p-10|20 → [m:p-10, d:p-20]
   if (cleanClass.includes('|')) {
-    return expandPipeNotation(cleanClass);
+    return expandPipeNotation(cleanClass, suffix);
   }
 
   // Step 5: Return single cleaned class
-  return [cleanClass];
+  return [restoreImportanceSuffix(cleanClass, suffix)];
 }
 
 /**
@@ -98,9 +127,8 @@ function cleanClassName(className) {
     return className;
   }
 
-  // Convert number followed by any string: property-NUMBER+STRING → property-[NUMBER+STRING]
-  // Matches: 12px, 50vh, 100%, 45deg, 300ms, etc.
-  return className.replace(/^([^-]+)-(\d+[a-zA-Z%]+)$/, '$1-[$2]');
+  // Convert number followed by px: property-NUMBERpx → property-[NUMBERpx]
+  return className.replace(/^([^-]+)-(\d+px)$/, '$1-[$2]');
 }
 
 /**
@@ -168,7 +196,7 @@ function parseClassPattern(className) {
  * @param {string} className
  * @returns {string[]} Array of expanded class names
  */
-function expandPipeNotation(className) {
+function expandPipeNotation(className, importanceSuffix = '') {
   // Extract modifier prefix (hover:, focus:, etc.)
   const { prefix, baseClass } = extractModifierPrefix(className);
 
@@ -186,8 +214,9 @@ function expandPipeNotation(className) {
 
   return selectedBreakpoints.map((breakpoint, index) => {
     const classValue = `${negative}${base}-${values[index]}`;
-    const fullClass = prefix ? `${prefix}${classValue}` : classValue;
-    return `${breakpoint}:${fullClass}`;
+    const cleanedValue = cleanClassName(classValue);
+    const fullClass = prefix ? `${prefix}${cleanedValue}` : cleanedValue;
+    return restoreImportanceSuffix(`${breakpoint}:${fullClass}`, importanceSuffix);
   });
 }
 
@@ -198,19 +227,20 @@ function expandPipeNotation(className) {
  */
 // Memoized CSS rule generation for performance
 const generateCSSRule = memoize(function(className) {
-  const parsed = parseClassModifiers(className);
+  const { baseClassName: sanitizedClassName, level: importanceLevel } = parseImportanceSuffix(className);
+  const parsed = parseClassModifiers(sanitizedClassName);
   const { actualClass, breakpoint, modifiers } = parsed;
 
   // Try keyword classes first
-  const keywordCSS = tryParseKeyword(actualClass, className, modifiers, breakpoint);
+  const keywordCSS = tryParseKeyword(actualClass, className, modifiers, breakpoint, importanceLevel);
   if (keywordCSS) return keywordCSS;
 
   // Try numeric classes (including fractions)
-  const numericCSS = tryParseNumeric(actualClass, className, modifiers, breakpoint);
+  const numericCSS = tryParseNumeric(actualClass, className, modifiers, breakpoint, importanceLevel);
   if (numericCSS) return numericCSS;
 
   // Try arbitrary values
-  const arbitraryCSS = tryParseArbitrary(actualClass, className, modifiers, breakpoint);
+  const arbitraryCSS = tryParseArbitrary(actualClass, className, modifiers, breakpoint, importanceLevel);
   if (arbitraryCSS) return arbitraryCSS;
 
   return null;
@@ -254,9 +284,9 @@ const parseClassModifiers = memoize(function(className) {
  * @param {string|null} breakpoint
  * @returns {string|null}
  */
-function tryParseKeyword(actualClass, className, modifiers, breakpoint) {
+function tryParseKeyword(actualClass, className, modifiers, breakpoint, importanceLevel) {
   if (CONFIG.keywords && CONFIG.keywords[actualClass]) {
-    return buildCSSRule(className, 'KEYWORD', CONFIG.keywords[actualClass], modifiers, breakpoint);
+    return buildCSSRule(className, 'KEYWORD', CONFIG.keywords[actualClass], modifiers, breakpoint, importanceLevel);
   }
   return null;
 }
@@ -269,7 +299,7 @@ function tryParseKeyword(actualClass, className, modifiers, breakpoint) {
  * @param {string|null} breakpoint
  * @returns {string|null}
  */
-function tryParseNumeric(actualClass, className, modifiers, breakpoint) {
+function tryParseNumeric(actualClass, className, modifiers, breakpoint, importanceLevel) {
   // Try fractional values first (w-1/2, h-3/4, etc.)
   const fractionMatch = actualClass.match(/^(-?)([a-z-]+)-(\d+)\/(\d+)$/);
   if (fractionMatch) {
@@ -279,7 +309,7 @@ function tryParseNumeric(actualClass, className, modifiers, breakpoint) {
     const cssProperty = CONFIG.props[property];
 
     if (!cssProperty) return null;
-    return buildCSSRule(className, cssProperty, cssValue, modifiers, breakpoint);
+    return buildCSSRule(className, cssProperty, cssValue, modifiers, breakpoint, importanceLevel);
   }
 
   // Try regular numeric values
@@ -324,7 +354,7 @@ function tryParseNumeric(actualClass, className, modifiers, breakpoint) {
     }
   }
 
-  return buildCSSRule(className, cssProperty, cssValue, modifiers, breakpoint);
+  return buildCSSRule(className, cssProperty, cssValue, modifiers, breakpoint, importanceLevel);
 }
 
 /**
@@ -335,7 +365,7 @@ function tryParseNumeric(actualClass, className, modifiers, breakpoint) {
  * @param {string|null} breakpoint
  * @returns {string|null}
  */
-function tryParseArbitrary(actualClass, className, modifiers, breakpoint) {
+function tryParseArbitrary(actualClass, className, modifiers, breakpoint, importanceLevel) {
   const match = actualClass.match(/^([a-z-]+)-(.+)$/);
   if (!match) return null;
 
@@ -389,7 +419,7 @@ function tryParseArbitrary(actualClass, className, modifiers, breakpoint) {
     }
   }
 
-  return buildCSSRule(className, resolvedProperty, cssValue, modifiers, breakpoint);
+  return buildCSSRule(className, resolvedProperty, cssValue, modifiers, breakpoint, importanceLevel);
 }
 
 /**
@@ -425,9 +455,14 @@ function calculateNumericValue(property, value, unit, negative) {
  * @param {string|null} breakpoint
  * @returns {string}
  */
-function buildCSSRule(className, cssProperty, cssValue, modifiers, breakpoint) {
-  const selector = buildCSSSelector(className, modifiers);
-  const rule = buildCSSDeclaration(selector, cssProperty, cssValue);
+function buildCSSRule(className, cssProperty, cssValue, modifiers, breakpoint, importanceLevel = IMPORTANCE_LEVELS.NONE) {
+  let selector = buildCSSSelector(className, modifiers);
+
+  if (importanceLevel === IMPORTANCE_LEVELS.SCOPED) {
+    selector = `html body ${selector}`;
+  }
+
+  const rule = buildCSSDeclaration(selector, cssProperty, cssValue, importanceLevel);
 
   return breakpoint
     ? `@media ${CONFIG.breakpoints[breakpoint]} { ${rule} }`
@@ -466,17 +501,49 @@ function buildCSSSelector(className, modifiers) {
  * @param {string} cssValue
  * @returns {string}
  */
-function buildCSSDeclaration(selector, cssProperty, cssValue) {
+function buildCSSDeclaration(selector, cssProperty, cssValue, importanceLevel = IMPORTANCE_LEVELS.NONE) {
+  const shouldAddImportant = importanceLevel === IMPORTANCE_LEVELS.IMPORTANT;
+
   if (cssProperty === 'KEYWORD') {
-    return `${selector} { ${cssValue} }`;
+    const keywordValue = shouldAddImportant
+      ? appendImportantToKeywordBlock(cssValue)
+      : cssValue;
+    return `${selector} { ${keywordValue} }`;
   }
 
+  const valueWithImportance = shouldAddImportant
+    ? appendImportant(cssValue)
+    : cssValue;
+
   if (Array.isArray(cssProperty)) {
-    const declarations = cssProperty.map(prop => `${prop}: ${cssValue}`).join('; ');
+    const declarations = cssProperty
+      .map(prop => `${prop}: ${valueWithImportance}`)
+      .join('; ');
     return `${selector} { ${declarations}; }`;
   }
 
-  return `${selector} { ${cssProperty}: ${cssValue}; }`;
+  return `${selector} { ${cssProperty}: ${valueWithImportance}; }`;
+}
+
+function appendImportant(value) {
+  if (!value || /!important\s*$/i.test(value)) {
+    return value;
+  }
+  return `${value} !important`;
+}
+
+function appendImportantToKeywordBlock(block) {
+  if (!block) {
+    return block;
+  }
+
+  const declarations = block
+    .split(';')
+    .map(part => part.trim())
+    .filter(Boolean)
+    .map(part => (part.endsWith('!important') ? part : `${part} !important`));
+
+  return declarations.join('; ');
 }
 
 function isLikelyColorValue(value) {

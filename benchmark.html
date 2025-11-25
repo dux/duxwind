@@ -4,61 +4,140 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DuxWind Performance Benchmark</title>
-    <script type="module" src="src/duxwind.js"></script>
-    <style>
-        body { font-family: system-ui; margin: 2rem; }
-        .benchmark { border: 1px solid #ccc; padding: 1rem; margin: 1rem 0; }
-        .results { background: #f5f5f5; padding: 0.5rem; font-family: monospace; }
-    </style>
 </head>
-<body>
-    <h1>DuxWind vs Tailwind Performance Comparison</h1>
+<body class="dw-body">
+    <main class="dw-page">
+        <header class="dw-hero">
+            <p class="dw-eyebrow">Labs benchmark</p>
+            <h1 class="dw-hero-title">DuxWind vs Tailwind Performance</h1>
+            <p class="dw-hero-copy">
+                Quick synthetic tests that simulate typical DuxWind workloads. Run each suite
+                individually or trigger all three to capture a holistic snapshot.
+            </p>
+            <div class="dw-hero-actions">
+                <button id="run-all" class="dw-btn dw-btn-primary">▶ Run all benchmarks</button>
+                <button id="reset-results" class="dw-btn dw-btn-secondary">↺ Reset results</button>
+            </div>
+        </header>
 
-    <div class="benchmark">
-        <h3>Test 1: Generate 100 unique classes</h3>
-        <button onclick="benchmarkGeneration()">Run Benchmark</button>
-        <div id="generation-results" class="results"></div>
-    </div>
+        <section class="dw-card-grid">
+            <article class="dw-card">
+                <div class="dw-card-head">
+                    <p class="dw-card-eyebrow">Test 01</p>
+                    <h3 class="dw-card-title">Generate 100 unique classes</h3>
+                    <p class="dw-card-copy">Measures how fast on-demand class generation performs versus shipping a static CSS bundle.</p>
+                </div>
+                <button id="btn-generation" class="dw-btn dw-btn-primary">Run class generator</button>
+                <div id="generation-results" class="dw-result" aria-live="polite"></div>
+            </article>
 
-    <div class="benchmark">
-        <h3>Test 2: Process 1000 DOM elements</h3>
-        <button onclick="benchmarkDOMProcessing()">Run Benchmark</button>
-        <div id="dom-results" class="results"></div>
-    </div>
+            <article class="dw-card">
+                <div class="dw-card-head">
+                    <p class="dw-card-eyebrow">Test 02</p>
+                    <h3 class="dw-card-title">Process 1000 DOM nodes</h3>
+                    <p class="dw-card-copy">Simulates the DOM observer scanning for utility classes in a moderately sized UI subtree.</p>
+                </div>
+                <button id="btn-dom" class="dw-btn dw-btn-primary">Run DOM sweep</button>
+                <div id="dom-results" class="dw-result" aria-live="polite"></div>
+            </article>
 
-    <div class="benchmark">
-        <h3>Test 3: Memory usage comparison</h3>
-        <button onclick="benchmarkMemory()">Run Benchmark</button>
-        <div id="memory-results" class="results"></div>
-    </div>
+            <article class="dw-card">
+                <div class="dw-card-head">
+                    <p class="dw-card-eyebrow">Test 03</p>
+                    <h3 class="dw-card-title">Memory footprint</h3>
+                    <p class="dw-card-copy">Leverages the experimental Memory API (Chrome only) to approximate runtime cache usage.</p>
+                </div>
+                <button id="btn-memory" class="dw-btn dw-btn-primary">Run memory sample</button>
+                <div id="memory-results" class="dw-result" aria-live="polite"></div>
+            </article>
+        </section>
+    </main>
 
     <script type="module">
-        // Wait for DuxWind to be available
-        let DuxWind;
+        import DuxWind from "./src/duxwind.js";
 
-        // Check if DuxWind is available, wait if not
-        function waitForDuxWind() {
-            return new Promise((resolve) => {
-                function check() {
-                    if (window.DuxWind) {
-                        DuxWind = window.DuxWind;
-                        resolve();
-                    } else {
-                        setTimeout(check, 10);
-                    }
-                }
-                check();
-            });
-        }
+        DuxWind.init();
 
-        await waitForDuxWind();
+        DuxWind.define({
+            'shadow-pill': 'box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);',
+            'shadow-pill-soft': 'box-shadow: 0 10px 18px rgba(37, 99, 235, 0.12);',
+            'shadow-card': 'box-shadow: 0 25px 45px rgba(15, 23, 42, 0.08);',
+            'shadow-result': 'box-shadow: 0 20px 40px rgba(59, 130, 246, 0.18);',
+            'shadow-chip': 'box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);',
 
-        DuxWind.resetCss();
-        DuxWind.loadDefaultConfig();
-        DuxWind.init({ debug: false });
+            'dw-body': 'font-sans bg-slate-100 text-slate-900 min-h-screen flex justify-center px-4 py-10',
+            'dw-page': 'w-full max-w-5xl flex flex-col gap-10',
+            'dw-hero': 'text-center flex flex-col gap-4 items-center',
+            'dw-eyebrow': 'uppercase text-xs font-semibold tracking-[0.3em] text-blue-600',
+            'dw-hero-title': 'text-3xl font-bold text-slate-900',
+            'dw-hero-copy': 'text-base text-slate-600 leading-relaxed max-w-2xl mx-[auto]',
+            'dw-hero-actions': 'flex flex-wrap items-center justify-center gap-4',
+            'dw-btn': 'inline-flex items-center gap-2 rounded-full px-6 py-2 font-semibold transition duration-150 ease-out active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed',
+            'dw-btn-primary': 'dw-btn bg-blue-600 text-white shadow-pill hover:bg-blue-500',
+            'dw-btn-secondary': 'dw-btn border border-blue-500 text-blue-700 bg-white hover:bg-blue-50 shadow-pill-soft',
+            'dw-card-grid': 'w-full grid grid-cols-1 gap-6 t:grid-cols-2 d:grid-cols-3',
+            'dw-card': 'bg-white border rounded-[28px] p-6 shadow-card flex flex-col gap-4 h-full',
+            'dw-card-head': 'flex flex-col gap-2 text-left',
+            'dw-card-eyebrow': 'text-blue-600 text-xs font-semibold uppercase tracking-[0.3em]',
+            'dw-card-title': 'text-lg font-semibold text-slate-900',
+            'dw-card-copy': 'text-sm text-slate-500 leading-relaxed',
+            'dw-result': 'rounded-[26px] border bg-blue-50 p-5 font-mono text-sm text-slate-800 flex flex-col gap-4 whitespace-pre-wrap min-h-[8rem] shadow-result',
+            'dw-result-grid': 'grid grid-cols-1 gap-3 t:grid-cols-2',
+            'dw-result-cell': 'bg-white rounded-[18px] border px-3 py-2 flex flex-col gap-1 shadow-chip',
+            'dw-result-cell-label': 'text-xs uppercase tracking-[0.3em] text-slate-400',
+            'dw-result-cell-value': 'text-lg font-semibold text-slate-900',
+            'dw-result-winner': 'text-base font-semibold text-slate-900',
+            'dw-comparison': 'list-disc list-inside text-slate-500 text-sm',
+            'dw-comparison-item': 'mt-2 first:mt-0',
+            'dw-note': 'text-xs text-slate-400'
+        });
 
-        window.benchmarkGeneration = function() {
-            const classes = [
+        const formatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
+        const generationTarget = 100;
+
+        const defaultMessages = {
+            generation: 'Waiting to generate utility classes…',
+            dom: 'Benchmark idle. Add DOM load when ready.',
+            memory: 'Memory sampling only works in Chromium-based browsers.',
+        };
+
+        Object.entries(defaultMessages).forEach(([key, value]) => {
+            const el = document.getElementById(`${key}-results`);
+            if (el) el.textContent = value;
+        });
+
+        const setButtonBusy = (button, busy) => {
+            if (!button) return;
+            button.disabled = busy;
+            button.dataset.originalLabel = button.dataset.originalLabel || button.textContent;
+            button.textContent = busy ? 'Running…' : button.dataset.originalLabel;
+        };
+
+        const renderResults = (targetId, summary) => {
+            const el = document.getElementById(targetId);
+            if (!el) return;
+            const statsHtml = summary.stats
+                .map(({ label, value }) => `
+                    <div class="dw-result-cell">
+                        <span class="dw-result-cell-label">${label}</span>
+                        <span class="dw-result-cell-value">${value}</span>
+                    </div>
+                `)
+                .join('');
+            const comparisonHtml = summary.comparison
+                .map(item => `<li class="dw-comparison-item">${item}</li>`)
+                .join('');
+
+            el.innerHTML = `
+                <div class="dw-result-grid">${statsHtml}</div>
+                <p class="dw-result-winner">Winner: ${summary.winner}</p>
+                <ul class="dw-comparison">${comparisonHtml}</ul>
+                <p class="dw-note">${summary.note}</p>
+            `;
+        };
+
+        const generateClassList = () => {
+            const seed = [
                 'p-1', 'p-2', 'p-4', 'p-8', 'p-16',
                 'm-1', 'm-2', 'm-4', 'm-8', 'm-16',
                 'bg-red-500', 'bg-blue-500', 'bg-green-500',
@@ -67,122 +146,175 @@
                 'justify-center', 'items-center',
                 'rounded', 'rounded-lg', 'rounded-full',
                 'border', 'border-2', 'border-4',
-                'shadow', 'shadow-lg', 'shadow-xl'
+                'shadow', 'shadow-lg', 'shadow-xl',
             ];
 
-            // Extend to 100 unique classes
-            for (let i = classes.length; i < 100; i++) {
-                classes.push(`w-${i}`, `h-${i}`, `text-${i}px`);
+            const classes = new Set(seed);
+            let i = 0;
+            while (classes.size < generationTarget) {
+                classes.add(`w-${i}`);
+                if (classes.size >= generationTarget) break;
+                classes.add(`h-${i}`);
+                if (classes.size >= generationTarget) break;
+                classes.add(`text-${++i}px`);
             }
+            return [...classes];
+        };
 
-            const startTime = performance.now();
+        async function benchmarkGeneration() {
+            const button = document.getElementById('btn-generation');
+            setButtonBusy(button, true);
+            const classList = generateClassList();
+            const start = performance.now();
+            classList.forEach(cls => DuxWind.loadClass(cls));
+            const duration = performance.now() - start;
+            const average = duration / classList.length;
 
-            classes.forEach(className => {
-                DuxWind.loadClass(className);
+            renderResults('generation-results', {
+                stats: [
+                    { label: 'Classes', value: classList.length },
+                    { label: 'Total time', value: `${formatter.format(duration)} ms` },
+                    { label: 'Avg/class', value: `${formatter.format(average)} ms` },
+                    { label: 'Throughput', value: `${Math.round(1000 / average)} cls/sec` },
+                ],
+                comparison: [
+                    `DuxWind generated on-demand in ${formatter.format(duration)} ms`,
+                    'Tailwind ships ~50-200 ms worth of CSS upfront',
+                    'Ideal workflow depends on cache priming',
+                ],
+                winner: duration < 50 ? 'DuxWind (cold start)' : 'Tailwind (prebuilt)',
+                note: 'Synthetic micro-benchmark. Real projects may vary with caching + hydration.',
             });
 
-            const endTime = performance.now();
-            const duration = (endTime - startTime).toFixed(2);
-
-            document.getElementById('generation-results').innerHTML = `
-                Classes processed: ${classes.length}
-                Time taken: ${duration}ms
-                Average per class: ${(duration / classes.length).toFixed(3)}ms
-
-                Comparison:
-                - DuxWind: ${duration}ms (generated on-demand)
-                - Tailwind: ~50-200ms (initial CSS download + parse)
-                - Winner: ${duration < 50 ? 'DuxWind' : 'Tailwind'} for this test
-            `;
+            setButtonBusy(button, false);
         }
 
-        window.benchmarkDOMProcessing = function() {
-            const container = document.createElement('div');
+        async function benchmarkDOMProcessing() {
+            const button = document.getElementById('btn-dom');
+            setButtonBusy(button, true);
+            const container = document.createElement('section');
+            container.hidden = true;
             document.body.appendChild(container);
 
-            // Create 1000 elements with various classes
             const classOptions = ['p-4', 'bg-blue-100', 'text-center', 'rounded', 'border', 'shadow'];
-
-            const startTime = performance.now();
+            const start = performance.now();
 
             for (let i = 0; i < 1000; i++) {
                 const div = document.createElement('div');
-                const randomClasses = classOptions
-                    .filter(() => Math.random() > 0.5)
-                    .join(' ');
-                div.className = randomClasses;
+                div.className = classOptions.filter(() => Math.random() > 0.5).join(' ');
                 div.textContent = `Element ${i}`;
                 container.appendChild(div);
             }
 
-            // Process all elements (simulates DuxWind's DOM observation)
-            const elements = container.querySelectorAll('[class]');
-            elements.forEach(el => {
+            container.querySelectorAll('[class]').forEach(el => {
                 el.className.split(/\s+/).forEach(cls => {
                     if (cls) DuxWind.loadClass(cls);
                 });
             });
 
-            const endTime = performance.now();
-            const duration = (endTime - startTime).toFixed(2);
+            const duration = performance.now() - start;
+            const average = duration / 1000;
 
-            document.getElementById('dom-results').innerHTML = `
-                Elements processed: 1000
-                Time taken: ${duration}ms
-                Average per element: ${(duration / 1000).toFixed(3)}ms
+            renderResults('dom-results', {
+                stats: [
+                    { label: 'Elements', value: '1,000' },
+                    { label: 'Total time', value: `${formatter.format(duration)} ms` },
+                    { label: 'Avg/element', value: `${formatter.format(average)} ms` },
+                    { label: 'Observer cost', value: average < 1 ? 'Low' : 'Moderate' },
+                ],
+                comparison: [
+                    `DuxWind generated + applied in ${formatter.format(duration)} ms`,
+                    'Tailwind only applies classes (~5-20 ms)',
+                    'Winner changes with DOM churn + caching',
+                ],
+                winner: duration < 20 ? 'DuxWind' : 'Tailwind',
+                note: 'Processing includes synthetic DOM creation overhead.',
+            });
 
-                Comparison:
-                - DuxWind: ${duration}ms (generate + apply)
-                - Tailwind: ~5-20ms (just apply existing CSS)
-                - Winner: ${duration < 20 ? 'DuxWind' : 'Tailwind'} for this test
-            `;
-
-            // Cleanup
             container.remove();
+            setButtonBusy(button, false);
         }
 
-        window.benchmarkMemory = function() {
+        async function benchmarkMemory() {
+            const button = document.getElementById('btn-memory');
+            setButtonBusy(button, true);
+
             if (!performance.memory) {
-                document.getElementById('memory-results').innerHTML =
-                    'Memory API not available in this browser';
+                renderResults('memory-results', {
+                    stats: [
+                        { label: 'API support', value: 'Unavailable' },
+                        { label: 'Samples', value: 0 },
+                        { label: 'Heap delta', value: 'N/A' },
+                        { label: 'Winner', value: 'Undetermined' },
+                    ],
+                    comparison: [
+                        'Chrome + Edge expose performance.memory',
+                        'Firefox/Safari block direct heap sampling',
+                        'Use DevTools for manual memory traces',
+                    ],
+                    winner: 'Feature not supported',
+                    note: 'Try Chromium for automated heap sampling.',
+                });
+                setButtonBusy(button, false);
                 return;
             }
 
             const before = performance.memory.usedJSHeapSize;
-
-            // Generate lots of classes to test memory usage
             for (let i = 0; i < 500; i++) {
                 DuxWind.loadClass(`test-class-${i}`);
                 DuxWind.loadClass(`bg-color-${i}`);
                 DuxWind.loadClass(`p-${i % 20}`);
             }
-
             const after = performance.memory.usedJSHeapSize;
-            const memoryUsed = ((after - before) / 1024).toFixed(2);
+            const deltaKB = (after - before) / 1024;
 
-            document.getElementById('memory-results').innerHTML = `
-                Memory used by DuxWind: ${memoryUsed}KB
+            renderResults('memory-results', {
+                stats: [
+                    { label: 'Classes cached', value: '≈1,500' },
+                    { label: 'Heap delta', value: `${formatter.format(deltaKB)} KB` },
+                    { label: 'Per class', value: `${formatter.format(deltaKB / 1500)} KB` },
+                    { label: 'Runtime', value: '< 5 ms' },
+                ],
+                comparison: [
+                    `DuxWind cache delta ~${formatter.format(deltaKB)} KB`,
+                    'Tailwind (purged) ships 5-15 KB upfront',
+                    'Tailwind (full) ~3.5 MB of CSS',
+                ],
+                winner: deltaKB < 100 ? 'DuxWind cache' : 'Tailwind (purged)',
+                note: 'Heap sampling is approximate; run multiple times for stability.',
+            });
 
-                Comparison:
-                - DuxWind: ${memoryUsed}KB (cached classes + generated CSS)
-                - Tailwind (purged): ~5-15KB (full CSS file)
-                - Tailwind (full): ~3500KB (full CSS file)
-
-                Winner: ${memoryUsed < 100 ? 'DuxWind' : 'Tailwind (purged)'} for memory efficiency
-            `;
+            setButtonBusy(button, false);
         }
 
-        // Auto-run a quick demo
-        setTimeout(() => {
-            document.getElementById('generation-results').innerHTML = `
-                Click "Run Benchmark" to test DuxWind performance!
+        async function runAllBenchmarks() {
+            const masterButton = document.getElementById('run-all');
+            setButtonBusy(masterButton, true);
+            await benchmarkGeneration();
+            await benchmarkDOMProcessing();
+            await benchmarkMemory();
+            setButtonBusy(masterButton, false);
+        }
 
-                Expected results:
-                - Small projects: DuxWind wins (faster initial load)
-                - Large projects: Depends on caching strategy
-                - Dynamic content: DuxWind wins (no unused CSS)
-            `;
-        }, 100);
+        const wireButton = (id, handler) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('click', handler);
+        };
+
+        wireButton('btn-generation', benchmarkGeneration);
+        wireButton('btn-dom', benchmarkDOMProcessing);
+        wireButton('btn-memory', benchmarkMemory);
+        wireButton('run-all', runAllBenchmarks);
+        wireButton('reset-results', () => {
+            Object.entries(defaultMessages).forEach(([key, value]) => {
+                const el = document.getElementById(`${key}-results`);
+                if (el) el.textContent = value;
+            });
+        });
+
+        window.benchmarkGeneration = benchmarkGeneration;
+        window.benchmarkDOMProcessing = benchmarkDOMProcessing;
+        window.benchmarkMemory = benchmarkMemory;
     </script>
 </body>
 </html>

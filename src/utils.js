@@ -5,7 +5,7 @@ import { CONSTANTS } from './config.js';
 /**
  * Memoization cache for performance optimization
  */
-const memoCache = new Map();
+const memoCaches = new Set();
 const CACHE_SIZE_LIMIT = 1000;
 
 /**
@@ -15,21 +15,24 @@ const CACHE_SIZE_LIMIT = 1000;
  * @returns {Function} Memoized function
  */
 export function memoize(fn, keyFn) {
+  const cache = new Map();
+  memoCaches.add(cache);
+
   return function(...args) {
     const key = keyFn ? keyFn(...args) : args.join('|');
-    
-    if (memoCache.has(key)) {
-      return memoCache.get(key);
+
+    if (cache.has(key)) {
+      return cache.get(key);
     }
-    
+
     // Clear cache if it gets too large
-    if (memoCache.size >= CACHE_SIZE_LIMIT) {
-      const firstKey = memoCache.keys().next().value;
-      memoCache.delete(firstKey);
+    if (cache.size >= CACHE_SIZE_LIMIT) {
+      const firstKey = cache.keys().next().value;
+      cache.delete(firstKey);
     }
-    
+
     const result = fn.apply(this, args);
-    memoCache.set(key, result);
+    cache.set(key, result);
     return result;
   };
 }
@@ -38,19 +41,20 @@ export function memoize(fn, keyFn) {
  * Clear memoization cache
  */
 export function clearMemoCache() {
-  memoCache.clear();
+  memoCaches.forEach(cache => cache.clear());
 }
 
 
 /**
  * Escape class name for CSS selector
- * @param {string} className 
+ * @param {string} className
  * @returns {string}
  */
 export function escapeSelector(className) {
   return className
     .replace(/:/g, '\\:')
     .replace(/\./g, '\\.')
+    .replace(/!/g, '\\!')
     .replace(/\//g, '\\/')
     .replace(/\[/g, '\\[')
     .replace(/\]/g, '\\]');
@@ -59,8 +63,8 @@ export function escapeSelector(className) {
 
 /**
  * Safe error wrapper for functions
- * @param {Function} fn 
- * @param {string} context 
+ * @param {Function} fn
+ * @param {string} context
  * @returns {Function}
  */
 export function safeWrapper(fn, context = 'unknown') {
@@ -79,8 +83,8 @@ export function safeWrapper(fn, context = 'unknown') {
 
 /**
  * Debounce function for performance
- * @param {Function} func 
- * @param {number} wait 
+ * @param {Function} func
+ * @param {number} wait
  * @returns {Function}
  */
 export function debounce(func, wait) {

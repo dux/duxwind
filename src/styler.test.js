@@ -1,6 +1,6 @@
 // Test file for styler.js - demonstrating standalone CSS generation
 import { describe, test, expect } from 'bun:test';
-import { generateStyles, processClass } from './styler.js';
+import { generateStyles, processClass, expandClass } from './styler.js';
 
 describe('DuxWind Styler - Standalone CSS Generation', () => {
 
@@ -95,6 +95,45 @@ describe('DuxWind Styler - Standalone CSS Generation', () => {
     expect(generateStyles('invalid-unknown-class')).toEqual([]);
     expect(generateStyles(null)).toEqual([]);
     expect(generateStyles(undefined)).toEqual([]);
+  });
+
+  test('Auto-bracketing only applies to pixel suffixes', () => {
+    expect(expandClass('w-12px')).toEqual(['w-[12px]']);
+    expect(expandClass('w-12foo')).toEqual(['w-12foo']);
+    expect(expandClass('svelte-4lanib')).toEqual(['svelte-4lanib']);
+    expect(expandClass('w-50vh')).toEqual(['w-50vh']);
+  });
+
+  test('Pipe notation preserves px-only bracketing', () => {
+    expect(expandClass('w-40px|50px')).toEqual(['m:w-[40px]', 't:w-[50px]']);
+    expect(expandClass('h-10foo|20foo')).toEqual(['m:h-10foo', 't:h-20foo']);
+  });
+
+  test('Importance suffix sticks through pipe expansion', () => {
+    expect(expandClass('w-40px|50px!')).toEqual(['m:w-[40px]!', 't:w-[50px]!']);
+  });
+
+  test('Single ! appends !important to declarations', () => {
+    const rules = processClass('m-4!');
+    expect(rules).toHaveLength(1);
+    expect(rules[0]).toContain('!important');
+    expect(rules[0]).toContain('.m-4\\!');
+  });
+
+  test('Double !! increases specificity with html body prefix', () => {
+    const rules = processClass('m-4!!');
+    expect(rules).toHaveLength(1);
+    expect(rules[0]).toContain('html body .m-4\\!\\!');
+    expect(rules[0]).not.toMatch(/!important/);
+  });
+
+  test('Responsive classes keep importance behavior', () => {
+    const rules = processClass('m-4|8!');
+    expect(rules).toHaveLength(2);
+    rules.forEach(rule => {
+      expect(rule).toMatch(/@media/);
+      expect(rule).toContain('!important');
+    });
   });
 
   test('Performance test: generate 100 classes quickly', () => {

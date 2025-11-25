@@ -211,11 +211,12 @@ function parseRuleRecursive(rule, atRules) {
   const selectorPart = trimmed.slice(0, firstBrace).trim();
   const declarationPart = trimmed.slice(firstBrace + 1, lastBrace).trim();
 
-  if (!selectorPart.startsWith('.')) {
+  const normalizedSelector = normalizeSelectorForShortcut(selectorPart);
+  if (!normalizedSelector.startsWith('.')) {
     return null;
   }
 
-  const suffix = extractSelectorSuffix(selectorPart);
+  const suffix = extractSelectorSuffix(normalizedSelector);
   const declarations = splitDeclarations(declarationPart);
 
   return {
@@ -223,6 +224,24 @@ function parseRuleRecursive(rule, atRules) {
     suffix,
     declarations
   };
+}
+
+function normalizeSelectorForShortcut(selector) {
+  if (!selector) {
+    return '';
+  }
+
+  const trimmed = selector.trim();
+  if (trimmed.startsWith('.')) {
+    return trimmed;
+  }
+
+  const firstClassIndex = trimmed.indexOf('.');
+  if (firstClassIndex === -1) {
+    return trimmed;
+  }
+
+  return trimmed.slice(firstClassIndex);
 }
 
 function extractAtRuleBlock(rule) {
