@@ -48,7 +48,7 @@ global.document = {
 
 // Import DuxWind after setting up mocks and ensure the cached module export
 // is reattached to the mocked window environment for this file.
-const { default: DuxWind } = await import('../src/duxwind.js');
+const { default: DuxWind } = await import('../src/lib.js');
 global.window.DuxWind = DuxWind;
 
 describe('DuxWind Shortcut Suites', () => {

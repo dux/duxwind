@@ -22,7 +22,7 @@ Use this guide whenever you (or another AI assistant) need quick context on DuxW
 ## Quick Start
 
 ```html
-<script src="https://dux.github.io/duxwind/src/duxwind.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/duxwind@latest/dist/lib.min.js"></script>
 <script>
   DuxWind.init({
     debug: true,               // logs cache + class translations
@@ -41,7 +41,7 @@ Use this guide whenever you (or another AI assistant) need quick context on DuxW
 </script>
 ```
 
-- Script path can be local (`src/duxwind.js`) or hosted (GitHub Pages/CDN).
+- Script path can be local (`src/lib.js`) or hosted (GitHub Pages/CDN).
 - Breakpoints default to `m`, `t`, `d` plus friendly aliases; override them via `init()` only.
 - `debug: true` is smart about dev ports (`localhost`, `:3000`, etc.).
 

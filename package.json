@@ -24,10 +24,10 @@
     "README.md"
   ],
   "scripts": {
-    "build": "rm -rf dist/ && bun build src/duxwind.js --outfile dist/lib.js --format esm && bun build src/duxwind.js --outfile dist/lib.min.js --format esm --minify && bun build src/duxwind.js --outfile dist/lib.cjs --format cjs",
+    "build": "rm -rf dist/ && bun build src/lib.js --outfile dist/lib.js --format esm && bun build src/lib.js --outfile dist/lib.min.js --format esm --minify && bun build src/lib.js --outfile dist/lib.cjs --format cjs",
     "test": "bun test src/",
     "start": "bun bin/server.js",
-    "dev": "bun run bin/server.js & bun build src/duxwind.js --outdir dist --format cjs --outfile dist/lib.cjs --watch",
+    "dev": "bun run bin/server.js & bun build src/lib.js --outdir dist --format cjs --outfile dist/lib.cjs --watch",
     "pages": "open https://dux.github.io/duxwind/",
     "publish": "bun run build && bun run test && npm publish",
     "ai-bridge": "bun run bin/ai-bridge.js"

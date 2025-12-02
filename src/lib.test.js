@@ -48,7 +48,7 @@ global.document = {
 
 // Import DuxWind after setting up mocks. When the module is cached between
 // files we still need to reattach the default export onto the mocked window.
-const { default: DuxWind } = await import('../src/duxwind.js');
+const { default: DuxWind } = await import('../src/lib.js');
 global.window.DuxWind = DuxWind;
 
 describe('DuxWind Test Suite - Input/Output Examples', () => {
