@@ -16,6 +16,14 @@ PostWind was created to bridge the gap between Tailwind CSS's powerful utility-f
 
 PostWind maintains full compatibility with Tailwind's core concepts while adding conveniences that make utility-first CSS more accessible to developers at every level—meaning existing Tailwind knowledge (and almost every class name) works out of the box.
 
+### PostWind-only superpowers (vs. Tailwind)
+
+- **Relative offset helpers (`top-4`, `right-6`, arbitrary offsets)** automatically inject `position: relative`, so badges, pills, and labels can “nudge” themselves without wrapping every element in a relative parent.
+- **Inline container queries (`min-480:flex-row`, `max-640:grid-cols-1`)** give every component a built-in ResizeObserver that swaps layouts based on the element’s own width—no @container support or custom JS needed.
+- **`scroll-x:<seconds>` marquee system** clones track children, injects bespoke keyframes, and loops content at any duration, providing hands-free ticker/feature-parade UI.
+- **`visible:` viewport pseudo-class** ties scroll-triggered animations to utilities you already know (opacity, translate, scale, rotate) with auto cleanup once the element leaves the DOM.
+- **JavaScript-defined shortcuts (`PostWind.define`)** elevate Tailwind-style component recipes into first-class citizens with zero build tooling—mix responsive, pipe notation, and pseudo variants inside reusable tokens like `btn`, `badge`, or `chip`.
+
 ### Compatible + better than stock Tailwind
 
 - **Drop-in parity:** Core utilities, pseudo-classes, and responsive prefixes match Tailwind one-to-one—no mental remapping.
@@ -1001,6 +1009,11 @@ PostWind.define({
 | **Transforms** | ✅ Full support | ✅ Full support |
 | **Filters** | ⚡ Basic support | ✅ Full support |
 | **Backdrop Filters** | ⚡ Partial | ✅ Full support |
+| **Relative offset helpers** | ✅ `top/right/bottom/left` auto-inject `position: relative` | ⚠️ Must wrap each element in `relative` manually |
+| **Inline container queries** | ✅ `min-/max-` per-element rules via ResizeObserver | ⚠️ Requires new @container syntax + build tooling |
+| **`scroll-x:<seconds>` marquee** | ✅ Runtime child cloning + keyframes, no CSS authoring | ❌ No built-in marquee utility |
+| **`visible:` scroll animations** | ✅ Viewport-aware pseudo-class without JS | ⚠️ Needs JS + IntersectionObserver setup |
+| **Shortcut composer (`PostWind.define`)** | ✅ Runtime class macros without build step | ⚠️ Requires plugins/config & rebuild |
 
 ### Unique PostWind Features
 

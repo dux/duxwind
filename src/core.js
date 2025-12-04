@@ -2,7 +2,7 @@
 import { CONFIG, createDefaultConfig } from './config.js';
 import { processClass, expandClass } from './styler.js';
 import { addShortcut, isShortcut, CLASS_NAME_PATTERN } from './shortcuts.js';
-import { debounce, safeWrapper, clearMemoCache } from './utils.js';
+import { debounce, safeWrapper, clearMemoCache, escapeSelector } from './utils.js';
 import { splitContainerQueryClasses, updateContainerQueries, cleanupContainerQueriesForTree } from './container-query.js';
 import { generateDoc } from './gen-doc.js';
 
@@ -16,6 +16,10 @@ let currentBodyClass = null;
 let resizeObserver = null;
 let visibilityObserver = null;
 const elementsWithVisiblePseudo = new WeakMap();
+const processedScrollXElements = new WeakSet();
+const scrollXStyleCache = new Map();
+const SCROLL_X_CLASS_PATTERN = /^scroll-x:(\d+(?:\.\d+)?)$/;
+const SCROLL_X_DUPLICATE_ROUNDS = 3;
 
 // Configuration access
 export function getConfig() {
@@ -176,6 +180,8 @@ const processElement = safeWrapper(function(element) {
     elementsWithVisiblePseudo.set(element, regularClasses.filter(cls => cls.includes('visible:')));
     visibilityObserver.observe(element);
   }
+
+  applyScrollXEnhancements(element, regularClasses);
 }, 'processElement');
 
 
@@ -253,7 +259,66 @@ function getAnimationKeyframes() {
   0%, 100% { transform: translateY(-25%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
   50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
 }
+@keyframes pw-scroll-x {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 `;
+}
+
+function applyScrollXEnhancements(element, regularClasses) {
+  if (!element || !regularClasses?.length) {
+    return;
+  }
+
+  const scrollClass = regularClasses.find(cls => SCROLL_X_CLASS_PATTERN.test(cls));
+  if (!scrollClass) {
+    return;
+  }
+
+  const durationMatch = scrollClass.match(SCROLL_X_CLASS_PATTERN);
+  const duration = durationMatch ? parseFloat(durationMatch[1]) : null;
+  if (!duration || Number.isNaN(duration)) {
+    return;
+  }
+
+  ensureScrollXCSS(scrollClass, duration);
+  duplicateScrollXChildren(element);
+}
+
+function ensureScrollXCSS(className, durationSeconds) {
+  const cachedDuration = scrollXStyleCache.get(className);
+  if (cachedDuration === durationSeconds) {
+    return;
+  }
+
+  scrollXStyleCache.set(className, durationSeconds);
+
+  const escaped = escapeSelector(className);
+  const rule = `.${escaped} { display: inline-flex; animation: pw-scroll-x ${durationSeconds}s linear infinite; will-change: transform; }`;
+  const childRule = `.${escaped} > * { flex: 0 0 auto; }`;
+  injectCSS(`${rule}
+${childRule}`);
+}
+
+function duplicateScrollXChildren(element) {
+  if (processedScrollXElements.has(element)) {
+    return;
+  }
+
+  const originalChildren = Array.from(element.children);
+  if (!originalChildren.length) {
+    return;
+  }
+
+  processedScrollXElements.add(element);
+  element.setAttribute('data-pw-scroll-x', 'ready');
+
+  for (let round = 0; round < SCROLL_X_DUPLICATE_ROUNDS; round += 1) {
+    originalChildren.forEach(child => {
+      element.appendChild(child.cloneNode(true));
+    });
+  }
 }
 
 // Initialization

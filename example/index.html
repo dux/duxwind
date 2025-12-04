@@ -63,6 +63,49 @@
             line-height: 1.6;
             letter-spacing: -0.01em;
         }
+        .class-pill {
+            display: inline-flex !important;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.4rem 0.9rem !important;
+            border-radius: 999px;
+            border: 1px solid rgba(15, 23, 42, 0.12) !important;
+            background: rgba(248, 250, 252, 0.95) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            font-size: 0.78rem;
+            line-height: 1.4;
+            font-family: 'JetBrains Mono', 'SFMono-Regular', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            color: inherit !important;
+            margin-top: 0.4rem;
+            white-space: normal;
+            max-width: 100%;
+            word-break: break-word;
+        }
+        .class-pill::before {
+            content: attr(data-label);
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: currentColor;
+            opacity: 0.7;
+            white-space: nowrap;
+        }
+        .class-pill-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .class-pill-inverse {
+            border-color: rgba(255, 255, 255, 0.55);
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+        }
+        .class-pill-inverse::before {
+            color: rgba(255, 255, 255, 0.85);
+            opacity: 1;
+        }
     </style>
     <!-- Header -->
     <header class="bg-white border-b">
@@ -97,6 +140,7 @@
                 <button onclick="showSection('typography')" class="btn-outline">Typography</button>
                 <button onclick="showSection('colors')" class="btn-outline">Colors</button>
                 <button onclick="showSection('responsive')" class="btn-outline">Responsive</button>
+                <button onclick="showSection('offsets')" class="btn-outline">Offsets</button>
                 <button onclick="showSection('container-queries')" class="btn-outline">Container Queries</button>
                 <button onclick="showSection('flex')" class="btn-outline">Flexbox</button>
                 <button onclick="showSection('grid')" class="btn-outline">Grid</button>
@@ -105,6 +149,7 @@
                 <button onclick="showSection('transforms')" class="btn-outline">Transforms</button>
                 <button onclick="showSection('states')" class="btn-outline">States</button>
                 <button onclick="showSection('animations')" class="btn-outline">Animations</button>
+                <button onclick="showSection('marquee')" class="btn-outline">Scroll X</button>
                 <button onclick="showSection('visible')" class="btn-outline">Visible</button>
                 <button onclick="showSection('components')" class="btn-outline">Components</button>
                 <button onclick="showSection('shortcuts')" class="btn-outline">Shortcuts</button>
@@ -139,13 +184,9 @@
                     </div>
                 </div>
                 <div class="mt-4 p-3 bg-green-100 rounded border border-green-300">
-                    <code class="text-green-800 text-sm">
-                        import PostWind from 'https://cdn.jsdelivr.net/npm/postwind@latest/dist/lib.min.js';
-                        <br />
-                        <br />
-                        // Just one line needed - everything auto-loads!
-                        <br />
-                        PostWind.init();
+                    <code class="class-pill text-green-800" data-label="Import">
+                        import PostWind from 'https://cdn.jsdelivr.net/npm/postwind@latest/dist/lib.min.js';<br>
+                        // Everything auto-loads → PostWind.init();
                     </code>
                 </div>
             </div>
@@ -272,7 +313,7 @@
                     <h3 class="font-semibold mb-4">Flex Direction</h3>
                     <div class="space-y-6">
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>flex-row</code> - Horizontal layout (default)</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">flex-row</code> - Horizontal layout (default)</p>
                             <div class="flex flex-row gap-3 p-4 bg-gray-50 rounded">
                                 <div class="bg-blue-500 text-white px-4 py-2 rounded text-sm">1</div>
                                 <div class="bg-green-500 text-white px-4 py-2 rounded text-sm">2</div>
@@ -280,7 +321,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>flex-col</code> - Vertical layout</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">flex-col</code> - Vertical layout</p>
                             <div class="flex flex-col gap-3 p-4 bg-gray-50 rounded w-32">
                                 <div class="bg-blue-500 text-white px-4 py-2 rounded text-sm text-center">1</div>
                                 <div class="bg-green-500 text-white px-4 py-2 rounded text-sm text-center">2</div>
@@ -288,7 +329,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>flex-row-reverse</code> - Reversed horizontal</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">flex-row-reverse</code> - Reversed horizontal</p>
                             <div class="flex flex-row-reverse gap-3 p-4 bg-gray-50 rounded">
                                 <div class="bg-blue-500 text-white px-4 py-2 rounded text-sm">1</div>
                                 <div class="bg-green-500 text-white px-4 py-2 rounded text-sm">2</div>
@@ -296,7 +337,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>flex-col-reverse</code> - Reversed vertical</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">flex-col-reverse</code> - Reversed vertical</p>
                             <div class="flex flex-col-reverse gap-3 p-4 bg-gray-50 rounded w-32">
                                 <div class="bg-blue-500 text-white px-4 py-2 rounded text-sm text-center">1</div>
                                 <div class="bg-green-500 text-white px-4 py-2 rounded text-sm text-center">2</div>
@@ -310,7 +351,7 @@
                     <h3 class="font-semibold mb-4">Justify Content (Main Axis)</h3>
                     <div class="space-y-4">
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>justify-start</code> - Items at start</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">justify-start</code> - Items at start</p>
                             <div class="flex justify-start gap-2 p-4 bg-gray-50 rounded">
                                 <div class="bg-blue-500 text-white px-3 py-2 rounded text-sm">A</div>
                                 <div class="bg-green-500 text-white px-3 py-2 rounded text-sm">B</div>
@@ -318,7 +359,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>justify-center</code> - Items centered</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">justify-center</code> - Items centered</p>
                             <div class="flex justify-center gap-2 p-4 bg-gray-50 rounded">
                                 <div class="bg-blue-500 text-white px-3 py-2 rounded text-sm">A</div>
                                 <div class="bg-green-500 text-white px-3 py-2 rounded text-sm">B</div>
@@ -326,7 +367,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>justify-end</code> - Items at end</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">justify-end</code> - Items at end</p>
                             <div class="flex justify-end gap-2 p-4 bg-gray-50 rounded">
                                 <div class="bg-blue-500 text-white px-3 py-2 rounded text-sm">A</div>
                                 <div class="bg-green-500 text-white px-3 py-2 rounded text-sm">B</div>
@@ -334,7 +375,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>justify-between</code> - Space between items</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">justify-between</code> - Space between items</p>
                             <div class="flex justify-between p-4 bg-gray-50 rounded">
                                 <div class="bg-blue-500 text-white px-3 py-2 rounded text-sm">A</div>
                                 <div class="bg-green-500 text-white px-3 py-2 rounded text-sm">B</div>
@@ -342,7 +383,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>justify-around</code> - Space around items</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">justify-around</code> - Space around items</p>
                             <div class="flex justify-around p-4 bg-gray-50 rounded">
                                 <div class="bg-blue-500 text-white px-3 py-2 rounded text-sm">A</div>
                                 <div class="bg-green-500 text-white px-3 py-2 rounded text-sm">B</div>
@@ -350,7 +391,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>justify-evenly</code> - Equal space between</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">justify-evenly</code> - Equal space between</p>
                             <div class="flex justify-evenly p-4 bg-gray-50 rounded">
                                 <div class="bg-blue-500 text-white px-3 py-2 rounded text-sm">A</div>
                                 <div class="bg-green-500 text-white px-3 py-2 rounded text-sm">B</div>
@@ -364,7 +405,7 @@
                     <h3 class="font-semibold mb-4">Align Items (Cross Axis)</h3>
                     <div class="space-y-4">
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>items-start</code> - Items at cross-start</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">items-start</code> - Items at cross-start</p>
                             <div class="flex items-start gap-2 p-4 bg-gray-50 rounded h-24">
                                 <div class="bg-blue-500 text-white px-3 py-2 rounded text-sm">Short</div>
                                 <div class="bg-green-500 text-white px-3 py-1 rounded text-xs">Tiny</div>
@@ -372,7 +413,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>items-center</code> - Items centered on cross-axis</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">items-center</code> - Items centered on cross-axis</p>
                             <div class="flex items-center gap-2 p-4 bg-gray-50 rounded h-24">
                                 <div class="bg-blue-500 text-white px-3 py-2 rounded text-sm">Short</div>
                                 <div class="bg-green-500 text-white px-3 py-1 rounded text-xs">Tiny</div>
@@ -380,7 +421,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>items-end</code> - Items at cross-end</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">items-end</code> - Items at cross-end</p>
                             <div class="flex items-end gap-2 p-4 bg-gray-50 rounded h-24">
                                 <div class="bg-blue-500 text-white px-3 py-2 rounded text-sm">Short</div>
                                 <div class="bg-green-500 text-white px-3 py-1 rounded text-xs">Tiny</div>
@@ -388,7 +429,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>items-stretch</code> - Items stretch to fill</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">items-stretch</code> - Items stretch to fill</p>
                             <div class="flex items-stretch gap-2 p-4 bg-gray-50 rounded h-24">
                                 <div class="bg-blue-500 text-white px-3 py-2 rounded text-sm flex items-center">Stretched</div>
                                 <div class="bg-green-500 text-white px-3 py-2 rounded text-sm flex items-center">All Same</div>
@@ -402,7 +443,7 @@
                     <h3 class="font-semibold mb-4">Flex Wrap</h3>
                     <div class="space-y-4">
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>flex-nowrap</code> - No wrapping (default)</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">flex-nowrap</code> - No wrapping (default)</p>
                             <div class="flex flex-nowrap gap-2 p-4 bg-gray-50 rounded">
                                 <div class="bg-blue-500 text-white px-6 py-2 rounded text-sm flex-shrink-0">Item 1</div>
                                 <div class="bg-green-500 text-white px-6 py-2 rounded text-sm flex-shrink-0">Item 2</div>
@@ -412,7 +453,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>flex-wrap</code> - Allow wrapping</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Flex">flex-wrap</code> - Allow wrapping</p>
                             <div class="flex flex-wrap gap-2 p-4 bg-gray-50 rounded">
                                 <div class="bg-blue-500 text-white px-6 py-2 rounded text-sm">Item 1</div>
                                 <div class="bg-green-500 text-white px-6 py-2 rounded text-sm">Item 2</div>
@@ -533,7 +574,7 @@
                     <h3 class="font-semibold mb-4">Grid Columns</h3>
                     <div class="space-y-6">
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>grid-cols-1</code> - Single column</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Grid">grid-cols-1</code> - Single column</p>
                             <div class="grid grid-cols-1 gap-3">
                                 <div class="bg-blue-100 p-3 rounded text-center text-sm">Item 1</div>
                                 <div class="bg-blue-100 p-3 rounded text-center text-sm">Item 2</div>
@@ -541,7 +582,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>grid-cols-3</code> - Three columns</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Grid">grid-cols-3</code> - Three columns</p>
                             <div class="grid grid-cols-3 gap-3">
                                 <div class="bg-green-100 p-3 rounded text-center text-sm">Item 1</div>
                                 <div class="bg-green-100 p-3 rounded text-center text-sm">Item 2</div>
@@ -552,7 +593,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>grid-cols-6</code> - Six columns</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Grid">grid-cols-6</code> - Six columns</p>
                             <div class="grid grid-cols-6 gap-2">
                                 <div class="bg-purple-100 p-2 rounded text-center text-xs">1</div>
                                 <div class="bg-purple-100 p-2 rounded text-center text-xs">2</div>
@@ -635,7 +676,7 @@
 
                 <div class="card">
                     <h3 class="font-semibold mb-2">Responsive Card Grid (8 Items)</h3>
-                    <p class="text-sm text-gray-600 mb-4">Uses <code>m:grid-cols-1 t:grid-cols-2 d:grid-cols-4</code> so cards flow naturally with a roomy 20px gap.</p>
+                    <p class="text-sm text-gray-600 mb-4">Uses <code class="class-pill" data-label="Grid">m:grid-cols-1 t:grid-cols-2 d:grid-cols-4</code> so cards flow naturally with a roomy 20px gap.</p>
                     <div class="grid gap-5 m:grid-cols-1 t:grid-cols-2 d:grid-cols-4">
                         <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 shadow-sm">
                             <p class="text-xs uppercase tracking-wide text-blue-500 mb-1">Card 1</p>
@@ -684,7 +725,7 @@
                     <h3 class="font-semibold mb-4">Auto-Sizing Grids</h3>
                     <div class="space-y-6">
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>auto-cols-max</code> - Columns size to content</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Grid">auto-cols-max</code> - Columns size to content</p>
                             <div class="grid auto-cols-max grid-flow-col gap-3">
                                 <div class="bg-yellow-100 p-2 rounded text-center text-sm">Short</div>
                                 <div class="bg-yellow-200 p-2 rounded text-center text-sm">Much Longer Content</div>
@@ -692,7 +733,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>auto-rows-min</code> - Rows size to minimum content</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Grid">auto-rows-min</code> - Rows size to minimum content</p>
                             <div class="grid grid-cols-3 auto-rows-min gap-3">
                                 <div class="bg-pink-100 p-2 rounded text-center text-sm">Normal height</div>
                                 <div class="bg-pink-200 p-4 rounded text-center text-sm">Taller content with more text that wraps</div>
@@ -706,7 +747,7 @@
                     <h3 class="font-semibold mb-4">Grid Flow</h3>
                     <div class="space-y-6">
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>grid-flow-row</code> - Fill rows first (default)</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Grid">grid-flow-row</code> - Fill rows first (default)</p>
                             <div class="grid grid-cols-3 grid-flow-row gap-2">
                                 <div class="bg-emerald-100 p-2 rounded text-center text-xs">1</div>
                                 <div class="bg-emerald-100 p-2 rounded text-center text-xs">2</div>
@@ -716,7 +757,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2"><code>grid-flow-col</code> - Fill columns first</p>
+                            <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Grid">grid-flow-col</code> - Fill columns first</p>
                             <div class="grid grid-rows-2 grid-flow-col gap-2">
                                 <div class="bg-lime-100 p-2 rounded text-center text-xs">1</div>
                                 <div class="bg-lime-100 p-2 rounded text-center text-xs">2</div>
@@ -733,7 +774,7 @@
                     <div class="space-y-6">
                         <div class="grid grid-cols-1 d:grid-cols-3 gap-8">
                             <div>
-                                <p class="text-sm text-gray-600 mb-2"><code>gap-1</code> - Small gap</p>
+                                <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Grid">gap-1</code> - Small gap</p>
                                 <div class="grid grid-cols-2 gap-1">
                                     <div class="bg-violet-100 p-2 rounded text-xs text-center">A</div>
                                     <div class="bg-violet-100 p-2 rounded text-xs text-center">B</div>
@@ -742,7 +783,7 @@
                                 </div>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-600 mb-2"><code>gap-4</code> - Medium gap</p>
+                                <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Grid">gap-4</code> - Medium gap</p>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="bg-violet-200 p-2 rounded text-xs text-center">A</div>
                                     <div class="bg-violet-200 p-2 rounded text-xs text-center">B</div>
@@ -751,7 +792,7 @@
                                 </div>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-600 mb-2"><code>gap-8</code> - Large gap</p>
+                                <p class="text-sm text-gray-600 mb-2"><code class="class-pill" data-label="Grid">gap-8</code> - Large gap</p>
                                 <div class="grid grid-cols-2 gap-8">
                                     <div class="bg-violet-300 p-2 rounded text-xs text-center">A</div>
                                     <div class="bg-violet-300 p-2 rounded text-xs text-center">B</div>
@@ -761,7 +802,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2">Independent gap control: <code>gap-x-8 gap-y-2</code></p>
+                            <p class="text-sm text-gray-600 mb-2">Independent gap control: <code class="class-pill" data-label="Grid">gap-x-8 gap-y-2</code></p>
                             <div class="grid grid-cols-4 gap-x-8 gap-y-2">
                                 <div class="bg-fuchsia-100 p-2 rounded text-xs text-center">1</div>
                                 <div class="bg-fuchsia-100 p-2 rounded text-xs text-center">2</div>
@@ -780,7 +821,7 @@
                     <h3 class="font-semibold mb-4">Responsive Grid Layouts</h3>
                     <div class="space-y-6">
                         <div>
-                            <p class="text-sm text-gray-600 mb-2">Responsive columns: <code>grid-cols-1 d:grid-cols-3</code></p>
+                            <p class="text-sm text-gray-600 mb-2">Responsive columns: <code class="class-pill" data-label="Grid">grid-cols-1 d:grid-cols-3</code></p>
                             <div class="grid grid-cols-1 d:grid-cols-3 gap-4">
                                 <div class="bg-rose-100 p-4 rounded text-center text-sm">Stacks on mobile</div>
                                 <div class="bg-rose-200 p-4 rounded text-center text-sm">3-column on desktop</div>
@@ -788,7 +829,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600 mb-2">Responsive gaps: <code>gap-2 d:gap-6</code></p>
+                            <p class="text-sm text-gray-600 mb-2">Responsive gaps: <code class="class-pill" data-label="Grid">gap-2 d:gap-6</code></p>
                             <div class="grid grid-cols-2 d:grid-cols-4 gap-2 d:gap-6">
                                 <div class="bg-amber-100 p-2 rounded text-center text-sm">Small gap mobile</div>
                                 <div class="bg-amber-200 p-2 rounded text-center text-sm">Large gap desktop</div>
@@ -863,6 +904,7 @@
                             Hover for padding change
                         </div>
                     </div>
+                    <code class="class-pill" data-label="States">hover:bg-blue-200 hover:p-8 transition-all</code>
                 </div>
 
                 <div class="card">
@@ -873,6 +915,7 @@
                         </button>
                         <input type="text" placeholder="Focus me" class="w-full p-4 border rounded focus:border-blue-500 focus:ring-2 transition-all">
                     </div>
+                    <code class="class-pill" data-label="States">hover:bg-blue-600 active:bg-blue-700 focus:ring-2 focus:border-blue-500</code>
                 </div>
             </div>
         </section>
@@ -890,7 +933,7 @@
                         <li class="even:bg-blue-100 p-2 rounded">Fourth item (blue background - even)</li>
                         <li class="last:bg-red-100 last:font-semibold p-2 rounded">Last item (red background, bold)</li>
                     </ul>
-                    <code class="text-sm bg-gray-100 p-2 rounded block mt-2">first:bg-green-100 even:bg-blue-100 odd:bg-yellow-100 last:bg-red-100</code>
+                    <code class="class-pill" data-label="Child Selectors">first:bg-green-100 even:bg-blue-100 odd:bg-yellow-100 last:bg-red-100</code>
                 </div>
 
                 <div class="card">
@@ -914,7 +957,7 @@
                                 <span>Radio 2</span>
                             </label>
                         </div>
-                        <code class="text-sm bg-gray-100 p-2 rounded block">required:border-red-500 invalid:bg-red-50 checked:bg-green-500</code>
+                        <code class="class-pill" data-label="Form States">required:border-red-500 invalid:bg-red-50 checked:bg-green-500</code>
                     </div>
                 </div>
 
@@ -946,7 +989,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <code class="text-sm bg-gray-100 p-2 rounded block mt-2">odd:bg-gray-50 even:bg-white first:font-semibold last:text-right</code>
+                    <code class="class-pill" data-label="Row Styling">odd:bg-gray-50 even:bg-white first:font-semibold last:text-right</code>
                 </div>
 
                 <div class="card">
@@ -972,7 +1015,7 @@
                     <h3 class="font-semibold mb-4">Pipe Notation</h3>
                     <div class="p-4|12 bg-purple-100 rounded text-center">
                         <strong>Responsive Padding:</strong> 16px on mobile, 48px on desktop
-                        <br><code>class="p-4|12"</code>
+                        <br><code class="class-pill" data-label="Pipe">class="p-4|12"</code>
                     </div>
                 </div>
 
@@ -980,7 +1023,7 @@
                     <h3 class="font-semibold mb-4">@ Notation</h3>
                     <div class="p-8@m p-16@d bg-orange-100 rounded text-center">
                         <strong>@ Notation:</strong> 32px on mobile, 64px on desktop
-                        <br><code>class="p-8@m p-16@d"</code>
+                        <br><code class="class-pill" data-label="@ Notation">class="p-8@m p-16@d"</code>
                     </div>
                 </div>
 
@@ -988,37 +1031,85 @@
                     <h3 class="font-semibold mb-4">Breakpoint Prefixes</h3>
                     <div class="p-4 m:bg-red-100 d:bg-blue-100 rounded">
                         <p>Red on mobile, Blue on desktop</p>
-                        <code class="text-sm">m:bg-red-100 d:bg-blue-100</code>
+                        <code class="class-pill" data-label="Breakpoints">m:bg-red-100 d:bg-blue-100</code>
                     </div>
                 </div>
 
+            </div>
+        </section>
+
+        <!-- Offsets Section -->
+        <section id="offsets" class="section" style="display: none;">
+            <h2 class="h2 mb-4">Relative Offset Utilities</h2>
+            <p class="text-gray-600 mb-6">
+                Offset helpers automatically inject <code>position: relative</code> whenever you use <code>top/right/bottom/left</code> so badges, avatars, and labels can nudge into place without extra CSS. Mix them with responsive prefixes or arbitrary values for pixel-perfect tweaks.
+            </p>
+
+            <div class="space-y-8">
                 <div class="card">
-                    <h3 class="font-semibold mb-4">Relative Offset Utilities</h3>
-                    <p class="text-sm text-gray-600 mb-4">
-                        `top-*`, `right-*`, `bottom-*`, and `left-*` now include <code>position: relative</code> automatically, so responsive offsets are as simple as any spacing class.
-                    </p>
+                    <h3 class="font-semibold mb-4">Chips & Pills</h3>
+                    <p class="text-sm text-gray-600 mb-4">A quick sampler of offsets on inline tags.</p>
                     <div class="border border-dashed border-gray-300 rounded-xl p-4 bg-white">
                         <div class="flex flex-wrap gap-4 items-start mb-4">
-                            <span class="px-3 py-1 rounded-full bg-violet-100 text-violet-800 text-sm">
-                                Baseline chip
-                            </span>
-                            <span class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-sm top-3">
-                                top-3 → down 12px
-                            </span>
-                            <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-sm right-4">
-                                right-4 → 16px from the right
-                            </span>
+                            <span class="px-3 py-1 rounded-full bg-violet-100 text-violet-800 text-sm">Baseline chip</span>
+                            <span class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-sm top-3">top-3 → down 12px</span>
+                            <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-sm right-4">right-4 → 16px inset</span>
                         </div>
                         <div class="flex flex-wrap gap-3 items-start">
-                            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-sm left-[10px]">
-                                left-[10px] → custom value
-                            </span>
-                            <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm m:bottom-2 d:top-0">
-                                m:bottom-2 d:top-0 → switches per breakpoint
-                            </span>
+                            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-sm left-[10px]">left-[10px] → custom</span>
+                            <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm m:bottom-2 d:top-0">m:bottom-2 d:top-0</span>
                         </div>
                     </div>
-                    <code class="text-sm bg-gray-100 p-2 rounded block mt-4">top-3 right-4 left-[10px] m:bottom-2 d:top-0</code>
+                    <code class="class-pill" data-label="Chips">top-3 right-4 left-[10px] m:bottom-2 d:top-0</code>
+                </div>
+
+                <div class="card">
+                    <h3 class="font-semibold mb-4">Layered Avatar Badges</h3>
+                    <p class="text-sm text-gray-600 mb-4">Stack small indicators inside cards without absolute positioning.</p>
+                    <div class="grid gap-4 m:grid-cols-1 d:grid-cols-3">
+                        <div class="relative bg-white border rounded-2xl p-6 shadow-sm">
+                            <div class="w-14 h-14 rounded-full bg-blue-500 mb-4"></div>
+                            <p class="font-semibold">Product Design</p>
+                            <p class="text-sm text-gray-600">Offset badges with <code>top-2 right-2</code>.</p>
+                            <span class="absolute top-2 right-2 inline-flex items-center justify-center w-6 h-6 bg-white border border-blue-200 rounded-full text-xs text-blue-600">+5</span>
+                        </div>
+                        <div class="relative bg-white border rounded-2xl p-6 shadow-sm">
+                            <div class="w-14 h-14 rounded-full bg-emerald-500 mb-4"></div>
+                            <p class="font-semibold">Ops &amp; Uptime</p>
+                            <p class="text-sm text-gray-600">`bottom-3 left-3` tucks alerts at the base.</p>
+                            <span class="absolute bottom-3 left-3 inline-flex items-center gap-1 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-[11px] text-emerald-700">● Stable</span>
+                        </div>
+                        <div class="relative bg-white border rounded-2xl p-6 shadow-sm">
+                            <div class="w-14 h-14 rounded-full bg-amber-400 mb-4"></div>
+                            <p class="font-semibold">Finance</p>
+                            <p class="text-sm text-gray-600">Arbitrary offsets for badge stacks.</p>
+                            <span class="absolute top-[18px] left-[52px] inline-flex items-center justify-center w-7 h-7 bg-amber-100 border border-amber-200 rounded-full text-[11px] text-amber-800">%</span>
+                        </div>
+                    </div>
+                    <code class="class-pill" data-label="Avatar Badges">absolute top-2 right-2 bottom-3 left-3 top-[18px] left-[52px]</code>
+                </div>
+
+                <div class="card">
+                    <h3 class="font-semibold mb-4">Timeline with Responsive Nudges</h3>
+                    <p class="text-sm text-gray-600 mb-4">Use offsets alongside breakpoint prefixes for clever label positioning.</p>
+                    <div class="space-y-6">
+                        <div class="relative pl-10 border-l-2 border-dashed border-gray-300">
+                            <span class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-blue-500"></span>
+                            <p class="font-semibold mb-1">Kickoff</p>
+                            <p class="text-sm text-gray-600">`-left-3` pins the marker; <code>m:top-4</code> shifts it only on phones.</p>
+                        </div>
+                        <div class="relative pl-10 border-l-2 border-dashed border-gray-300">
+                            <span class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-emerald-500"></span>
+                            <p class="font-semibold mb-1">Beta Access</p>
+                            <p class="text-sm text-gray-600">Combine <code>top-6</code> with <code>d:left-2</code> for desktop spacing.</p>
+                        </div>
+                        <div class="relative pl-10 border-l-2 border-dashed border-gray-300">
+                            <span class="absolute -left-3 top-0 w-6 h-6 rounded-full bg-rose-500"></span>
+                            <p class="font-semibold mb-1">Launch</p>
+                            <p class="text-sm text-gray-600">Arbitrary values like <code>top-[22px]</code> refine timeline alignment.</p>
+                        </div>
+                    </div>
+                    <code class="class-pill" data-label="Timeline">-left-3 top-6 m:top-4 d:left-2 top-[22px]</code>
                 </div>
             </div>
         </section>
@@ -1072,7 +1163,7 @@
                                 <p class="text-cyan-700 text-sm">Gracefully collapses into a column on narrow widths.</p>
                             </div>
                         </div>
-                        <code class="text-xs bg-white border rounded px-2 py-1 inline-block mt-3">class="max-640:flex-col min-900:flex-row"</code>
+                        <code class="class-pill" data-label="Container Query">max-640:flex-col min-900:flex-row</code>
                     </div>
                 </div>
 
@@ -1102,6 +1193,7 @@
                                 </div>
                             </div>
                         </div>
+                        <code class="class-pill" data-label="Container">max-480:flex-col min-481:flex-row</code>
                     </div>
 
                     <div class="card">
@@ -1131,6 +1223,7 @@
                                 </div>
                             </div>
                         </div>
+                        <code class="class-pill" data-label="Container">max-420:grid-cols-1 min-421:grid-cols-2</code>
                     </div>
                 </div>
             </div>
@@ -1958,6 +2051,66 @@
             </div>
         </section>
 
+        <!-- Scroll-X Section -->
+        <section id="marquee" class="section" style="display: none;">
+            <h2 class="h2 mb-4">Infinite Horizontal Scroll (scroll-x)</h2>
+            <p class="text-gray-600 mb-8">
+                Add <code>scroll-x:&lt;seconds&gt;</code> to any inline track to auto-generate a looping marquee.
+                PostWind duplicates the children three extra times and injects the correct animation speed for you—no manual CSS needed.
+            </p>
+
+            <div class="space-y-8">
+                <div class="card space-y-4">
+                    <div>
+                        <h3 class="font-semibold text-gray-900">Ticker in 12 Seconds</h3>
+                        <p class="text-sm text-gray-600">Great for compact status pills or announcement badges.</p>
+                    </div>
+                    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
+                        <div class="scroll-x:12 items-center gap-4 px-6 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-gray-700">
+                            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm">Launch</span>
+                            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm">AI Copilot</span>
+                            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm">Realtime CSS</span>
+                            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm">Shortcuts</span>
+                            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm">Container Queries</span>
+                        </div>
+                    </div>
+                    <code class="class-pill" data-label="Ticker">scroll-x:12</code>
+                </div>
+
+                <div class="card space-y-4">
+                    <div>
+                        <h3 class="font-semibold text-gray-900">Feature Parade in 24 Seconds</h3>
+                        <p class="text-sm text-gray-600">Longer timelines stay smooth thanks to automatic child cloning.</p>
+                    </div>
+                    <div class="overflow-hidden rounded-2xl border border-blue-200 bg-white">
+                        <div class="scroll-x:24 items-center gap-6 px-6 py-5 text-sm">
+                            <div class="min-w-[200px] bg-blue-50 border border-blue-100 rounded-2xl px-4 py-3">
+                                <p class="text-[11px] uppercase tracking-widest text-blue-500 mb-1">Realtime</p>
+                                <p class="font-semibold text-blue-900">Hot Reloaded Utilities</p>
+                            </div>
+                            <div class="min-w-[200px] bg-emerald-50 border border-emerald-100 rounded-2xl px-4 py-3">
+                                <p class="text-[11px] uppercase tracking-widest text-emerald-500 mb-1">Automation</p>
+                                <p class="font-semibold text-emerald-900">Class Shortcuts</p>
+                            </div>
+                            <div class="min-w-[200px] bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3">
+                                <p class="text-[11px] uppercase tracking-widest text-amber-500 mb-1">Responsive</p>
+                                <p class="font-semibold text-amber-900">Container Queries</p>
+                            </div>
+                            <div class="min-w-[200px] bg-rose-50 border border-rose-100 rounded-2xl px-4 py-3">
+                                <p class="text-[11px] uppercase tracking-widest text-rose-500 mb-1">Visibility</p>
+                                <p class="font-semibold text-rose-900">visible: Animations</p>
+                            </div>
+                            <div class="min-w-[200px] bg-gray-100 border border-gray-200 rounded-2xl px-4 py-3">
+                                <p class="text-[11px] uppercase tracking-widest text-gray-500 mb-1">Tooling</p>
+                                <p class="font-semibold text-gray-900">Docs Generator</p>
+                            </div>
+                        </div>
+                    </div>
+                    <code class="class-pill" data-label="Timeline">scroll-x:24</code>
+                </div>
+            </div>
+        </section>
+
         <!-- Visible Pseudo-class Section -->
         <section id="visible" class="section" style="display: none;">
             <h2 class="h2 mb-6">Visible Pseudo-class (Scroll Animations)</h2>
@@ -1972,28 +2125,28 @@
                         <div class="visible:opacity-100 opacity-0 transition-all duration-700 bg-blue-100 p-6 rounded-lg">
                             <h4 class="font-semibold text-lg mb-2">Simple Fade In</h4>
                             <p class="text-gray-700">I fade in when you scroll to me!</p>
-                            <code class="text-xs text-gray-600 block mt-2">visible:opacity-100 opacity-0 transition-all duration-700</code>
+                            <code class="class-pill" data-label="Fade">visible:opacity-100 opacity-0 transition-all duration-700</code>
                         </div>
 
                         <!-- Slide Up -->
                         <div class="visible:translate-y-0 visible:opacity-100 translate-y-8 opacity-0 transition-all duration-700 bg-green-100 p-6 rounded-lg">
                             <h4 class="font-semibold text-lg mb-2">Slide Up & Fade</h4>
                             <p class="text-gray-700">I slide up and fade in simultaneously!</p>
-                            <code class="text-xs text-gray-600 block mt-2">visible:translate-y-0 visible:opacity-100 translate-y-8 opacity-0</code>
+                            <code class="class-pill" data-label="Slide">visible:translate-y-0 visible:opacity-100 translate-y-8 opacity-0</code>
                         </div>
 
                         <!-- Scale -->
                         <div class="visible:scale-100 visible:opacity-100 scale-90 opacity-0 transition-all duration-700 bg-purple-100 p-6 rounded-lg">
                             <h4 class="font-semibold text-lg mb-2">Scale Effect</h4>
                             <p class="text-gray-700">I grow from a smaller size!</p>
-                            <code class="text-xs text-gray-600 block mt-2">visible:scale-100 visible:opacity-100 scale-90 opacity-0</code>
+                            <code class="class-pill" data-label="Scale">visible:scale-100 visible:opacity-100 scale-90 opacity-0</code>
                         </div>
 
                         <!-- Rotate -->
                         <div class="visible:rotate-0 visible:opacity-100 -rotate-12 opacity-0 transition-all duration-700 bg-yellow-100 p-6 rounded-lg">
                             <h4 class="font-semibold text-lg mb-2">Rotation Effect</h4>
                             <p class="text-gray-700">I rotate into position!</p>
-                            <code class="text-xs text-gray-600 block mt-2">visible:rotate-0 visible:opacity-100 -rotate-12 opacity-0</code>
+                            <code class="class-pill" data-label="Rotate">visible:rotate-0 visible:opacity-100 -rotate-12 opacity-0</code>
                         </div>
                     </div>
                 </div>
@@ -2006,21 +2159,21 @@
                         <div class="visible:translate-x-0 visible:opacity-100 -translate-x-full opacity-0 transition-all duration-700 bg-red-100 p-6 rounded-lg">
                             <h4 class="font-semibold text-lg mb-2">Slide From Left</h4>
                             <p class="text-gray-700">I slide in from the left side!</p>
-                            <code class="text-xs text-gray-600 block mt-2">visible:translate-x-0 visible:opacity-100 -translate-x-full opacity-0</code>
+                            <code class="class-pill" data-label="Left">visible:translate-x-0 visible:opacity-100 -translate-x-full opacity-0</code>
                         </div>
 
                         <!-- From Right -->
                         <div class="visible:translate-x-0 visible:opacity-100 translate-x-full opacity-0 transition-all duration-700 bg-orange-100 p-6 rounded-lg">
                             <h4 class="font-semibold text-lg mb-2">Slide From Right</h4>
                             <p class="text-gray-700">I slide in from the right side!</p>
-                            <code class="text-xs text-gray-600 block mt-2">visible:translate-x-0 visible:opacity-100 translate-x-full opacity-0</code>
+                            <code class="class-pill" data-label="Right">visible:translate-x-0 visible:opacity-100 translate-x-full opacity-0</code>
                         </div>
 
                         <!-- From Bottom -->
                         <div class="visible:translate-y-0 visible:opacity-100 translate-y-16 opacity-0 transition-all duration-700 bg-pink-100 p-6 rounded-lg">
                             <h4 class="font-semibold text-lg mb-2">Slide From Bottom</h4>
                             <p class="text-gray-700">I slide up from below!</p>
-                            <code class="text-xs text-gray-600 block mt-2">visible:translate-y-0 visible:opacity-100 translate-y-16 opacity-0</code>
+                            <code class="class-pill" data-label="Bottom">visible:translate-y-0 visible:opacity-100 translate-y-16 opacity-0</code>
                         </div>
                     </div>
                 </div>
@@ -2033,14 +2186,14 @@
                         <div class="visible:scale-100 visible:rotate-0 visible:opacity-100 scale-50 rotate-180 opacity-0 transition-all duration-1000 bg-gradient-to-r from-purple-200 to-pink-200 p-6 rounded-lg">
                             <h4 class="font-semibold text-lg mb-2">Scale + Rotate + Fade</h4>
                             <p class="text-gray-700">Multiple transformations at once!</p>
-                            <code class="text-xs text-gray-600 block mt-2">visible:scale-100 visible:rotate-0 visible:opacity-100 scale-50 rotate-180 opacity-0</code>
+                            <code class="class-pill" data-label="Effects">visible:scale-100 visible:rotate-0 visible:opacity-100 scale-50 rotate-180 opacity-0</code>
                         </div>
 
                         <!-- Bounce Effect -->
                         <div class="visible:translate-y-0 visible:scale-100 visible:opacity-100 translate-y-8 scale-110 opacity-0 transition-all duration-700 ease-[cubic-bezier(0.68,-0.55,0.265,1.55)] bg-gradient-to-r from-blue-200 to-cyan-200 p-6 rounded-lg">
                             <h4 class="font-semibold text-lg mb-2">Bounce Animation</h4>
                             <p class="text-gray-700">Custom easing for a bouncy effect!</p>
-                            <code class="text-xs text-gray-600 block mt-2">Custom cubic-bezier easing</code>
+                            <code class="class-pill" data-label="Bounce">visible:translate-y-0 visible:scale-100 visible:opacity-100 translate-y-8 scale-110 opacity-0 transition-all duration-700 ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]</code>
                         </div>
                     </div>
                 </div>
@@ -2059,6 +2212,7 @@
                         <div class="visible:opacity-100 visible:translate-y-0 opacity-0 translate-y-8 transition-all duration-500 delay-700 bg-indigo-200 h-24 rounded-lg flex items-center justify-center font-semibold">7</div>
                         <div class="visible:opacity-100 visible:translate-y-0 opacity-0 translate-y-8 transition-all duration-500 delay-800 bg-orange-200 h-24 rounded-lg flex items-center justify-center font-semibold">8</div>
                     </div>
+                    <code class="class-pill" data-label="Stagger">visible:opacity-100 visible:translate-y-0 opacity-0 translate-y-8 transition-all duration-500 delay-[100-800]</code>
                 </div>
 
                 <!-- Practical Examples -->
@@ -2074,6 +2228,10 @@
                                     <p class="text-gray-700">Great for highlighting features as users scroll through your page.</p>
                                 </div>
                             </div>
+                            <div class="class-pill-stack mt-4">
+                                <code class="class-pill" data-label="Feature">visible:translate-x-0 visible:opacity-100 -translate-x-8 opacity-0 transition-all duration-700</code>
+                                <code class="class-pill" data-label="Badge">visible:scale-100 scale-0 transition-all duration-700 delay-300</code>
+                            </div>
                         </div>
 
                         <!-- Stats Counter -->
@@ -2082,6 +2240,7 @@
                                 <div class="text-5xl font-bold mb-2">1000+</div>
                                 <div class="text-lg opacity-90">Happy Customers</div>
                             </div>
+                            <code class="class-pill class-pill-inverse text-white" data-label="Counter">visible:opacity-100 opacity-0 transition-all duration-700 + visible:scale-100 scale-0 transition-all duration-1000 delay-300</code>
                         </div>
 
                         <!-- Call to Action -->
@@ -2091,6 +2250,10 @@
                             <button class="visible:scale-100 scale-0 transition-all duration-500 delay-500 bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-semibold">
                                 Start Building
                             </button>
+                            <div class="class-pill-stack">
+                                <code class="class-pill" data-label="Container">visible:translate-y-0 visible:opacity-100 translate-y-8 opacity-0 transition-all duration-700</code>
+                                <code class="class-pill" data-label="CTA Button">visible:scale-100 scale-0 transition-all duration-500 delay-500</code>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2393,7 +2556,7 @@
         // Handle hash navigation
         function loadSectionFromHash() {
             const hash = window.location.hash.slice(1); // Remove #
-            const validSections = ['intro', 'spacing', 'typography', 'colors', 'responsive', 'container-queries', 'flex', 'grid', 'borders', 'rounded', 'transforms', 'states', 'animations', 'visible', 'components', 'shortcuts', 'documentation'];
+            const validSections = ['intro', 'spacing', 'typography', 'colors', 'responsive', 'offsets', 'container-queries', 'flex', 'grid', 'borders', 'rounded', 'transforms', 'states', 'animations', 'marquee', 'visible', 'components', 'shortcuts', 'documentation'];
 
             if (hash && validSections.includes(hash)) {
                 showSection(hash, false); // Don't update hash since we're loading from it
@@ -2406,6 +2569,49 @@
         window.addEventListener('hashchange', function() {
             loadSectionFromHash();
         });
+
+        function upgradeCodePills() {
+            const STRIP_CLASSES = ['block', 'inline-block', 'text-xs', 'text-sm', 'bg-gray-50', 'bg-gray-100', 'bg-white', 'border', 'border-gray-200', 'rounded', 'rounded-lg', 'rounded-xl', 'px-2', 'px-3', 'py-1', 'py-2', 'py-3', 'mt-2', 'mt-3', 'mt-4', 'p-2', 'p-3'];
+            const SHOULD_UPGRADE = (code) => {
+                if (code.dataset.pillIgnore === 'true') return false;
+                if (code.classList.contains('class-pill')) return true;
+                if (code.dataset.pill === 'true') return true;
+                if (code.classList.contains('block') || code.classList.contains('inline-block')) return true;
+                const classAttr = code.getAttribute('class');
+                if (!classAttr) return false;
+                return classAttr.trim().length > 0;
+            };
+
+            document.querySelectorAll('code').forEach(code => {
+                if (!SHOULD_UPGRADE(code)) {
+                    return;
+                }
+
+                code.classList.add('class-pill');
+                code.dataset.pill = 'true';
+
+                STRIP_CLASSES.forEach(cls => {
+                    code.classList.remove(cls);
+                });
+
+                if (!code.dataset.label) {
+                    code.dataset.label = inferCodeLabel(code.textContent || '');
+                }
+            });
+        }
+
+        function inferCodeLabel(text) {
+            const value = text.trim().toLowerCase();
+            if (!value) return 'Classes';
+            if (value.startsWith('class="')) return 'Markup';
+            if (value.includes('visible:')) return 'visible:';
+            if (value.includes('scroll-x')) return 'scroll-x';
+            if (value.includes('container')) return 'layout';
+            if (value.includes('rounded')) return 'rounded';
+            if (value.includes('animate')) return 'animate';
+            if (value.includes('ring') || value.includes('border')) return 'borders';
+            return 'Classes';
+        }
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
@@ -2424,6 +2630,8 @@
 
                 cqSlider.addEventListener('input', (event) => {
                     updateCqDemo(event.target.value);
+
+            upgradeCodePills();
                 });
 
                 updateCqDemo(cqSlider.value);
