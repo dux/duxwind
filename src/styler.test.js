@@ -37,6 +37,33 @@ describe('PostWind Styler - Standalone CSS Generation', () => {
     expect(hoverRule).toBeDefined();
   });
 
+  test('Named text colors stay as color, not font-size', () => {
+    const rules = processClass('hover:text-green');
+    expect(rules).toHaveLength(1);
+    expect(rules[0]).toContain('.hover\\:text-green:hover');
+    expect(rules[0]).toContain('color: green');
+    expect(rules[0]).not.toContain('font-size');
+  });
+
+  test('Palette-driven text utilities render expected RGB value', () => {
+    const rules = processClass('text-green-600');
+    expect(rules).toHaveLength(1);
+    expect(rules[0]).toContain('color: rgb(22 163 74)');
+  });
+
+  test('Generic text colors fallback to named color values', () => {
+    const rules = processClass('text-red');
+    expect(rules).toHaveLength(1);
+    expect(rules[0]).toContain('color: red');
+  });
+
+  test('Hover + named text colors resolve to color', () => {
+    const rules = processClass('hover:text-red');
+    expect(rules).toHaveLength(1);
+    expect(rules[0]).toContain('.hover\\:text-red:hover');
+    expect(rules[0]).toContain('color: red');
+  });
+
   test('Fractional widths: w-1/2 → width: 50%', () => {
     const styles = generateStyles('w-1/2');
     expect(styles).toHaveLength(1);

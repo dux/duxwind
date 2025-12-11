@@ -498,9 +498,7 @@ table{border-collapse:collapse;border-spacing:0}
 fieldset{border:none;padding:0}
 legend{padding:0}
 textarea{resize:vertical}
-details summary{cursor:pointer}
-:focus-visible{outline:2px solid #2563eb;outline-offset:2px}
-@media (prefers-color-scheme:dark){:root{color-scheme:dark}}`;
+details summary{cursor:pointer}`;
 
   let resetElement = document.querySelector('[data-postwind-reset]');
   if (!resetElement) {
